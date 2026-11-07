@@ -1,0 +1,61 @@
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Falta POSTGRES_USER en .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
+      POSTGRES_DB: ${POSTGRES_DB:?Falta POSTGRES_DB en .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_PASSWORD_FILE: /run/secrets/gensti_app_password
+      OUTBOX_FERNET_KEY_FILE: /run/secrets/outbox_fernet_key
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      OLLAMA_MODEL: qwen3:1.7b
+    secrets:
+      - gensti_app_password
+      - outbox_fernet_key
+
+  migrate:
+    build:
+      context: ./backend
+    profiles:
+      - tools
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    entrypoint: ["alembic"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MIGRATION_PASSWORD_FILE: /run/secrets/gensti_migration_password
+    secrets:
+      - gensti_migration_password
+
+secrets:
+  gensti_app_password:
+    file: ./secrets/gensti_app_password.txt
+  gensti_migration_password:
+    file: ./secrets/gensti_migration_password.txt
+  outbox_fernet_key:
+    file: ./secrets/outbox_fernet_key
+
+volumes:
+  postgres_data:

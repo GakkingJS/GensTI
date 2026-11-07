@@ -1,0 +1,463 @@
+.academic-page {
+  min-height: 900px;
+  padding: 100px 8% 120px;
+
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.academic-page-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 50px;
+
+  max-width: 1180px;
+  margin: 0 auto 55px;
+}
+
+.academic-page-intro h1 {
+  max-width: 760px;
+  margin: 14px 0 0;
+
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: clamp(48px, 7vw, 86px);
+  line-height: 0.94;
+  letter-spacing: -4px;
+}
+
+.academic-page-intro p {
+  max-width: 620px;
+  margin: 28px 0 0;
+
+  color: var(--color-text-muted);
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.academic-page-summary {
+  display: flex;
+  min-width: 155px;
+  flex-direction: column;
+
+  padding-left: 22px;
+  border-left: 1px solid var(--color-border-alt);
+}
+
+.academic-page-summary strong {
+  color: var(--color-accent);
+  font-family: var(--font-heading);
+  font-size: 52px;
+  line-height: 0.9;
+}
+
+.academic-page-summary span {
+  max-width: 120px;
+  margin-top: 12px;
+
+  color: var(--color-text-soft);
+  font-size: 11px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.academic-notice {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+
+  max-width: 1180px;
+  margin: 0 auto 85px;
+  padding: 20px 0;
+
+  border-top: 1px solid var(--color-border-alt);
+  border-bottom: 1px solid var(--color-border-alt);
+}
+
+.academic-notice span {
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  white-space: nowrap;
+}
+
+.academic-notice p {
+  max-width: 650px;
+  margin: 0;
+
+  color: var(--color-text-soft);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.academic-semesters {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.semester-section {
+  margin-bottom: 95px;
+}
+
+.semester-heading {
+  display: grid;
+  grid-template-columns: 70px 1fr auto;
+  align-items: end;
+  gap: 25px;
+
+  margin-bottom: 30px;
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid var(--color-border-alt);
+}
+
+.semester-heading > span {
+  color: var(--color-accent);
+  font-family: var(--font-heading);
+  font-size: 42px;
+  line-height: 0.9;
+}
+
+.semester-heading small {
+  color: var(--color-text-soft);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+}
+
+.semester-heading h2 {
+  margin: 7px 0 0;
+
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: 32px;
+  letter-spacing: -1px;
+}
+
+.semester-heading > strong {
+  color: var(--color-text-soft);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+
+  background: var(--color-border-alt);
+}
+
+.subject-card {
+  display: flex;
+  min-height: 275px;
+  flex-direction: column;
+
+  padding: 28px;
+
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.subject-card:hover {
+  background: #dcece8;
+  transform: translateY(-2px);
+}
+
+.subject-card-top {
+  display: flex;
+  justify-content: space-between;
+
+  color: var(--color-text-soft);
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.subject-card h3 {
+  margin: 42px 0 0;
+
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: 25px;
+  line-height: 1.08;
+}
+
+.subject-card p {
+  margin: 14px 0 0;
+
+  color: var(--color-text-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.subject-card-link {
+  display: inline-block;
+  width: fit-content;
+  margin-top: auto;
+  padding-top: 25px;
+
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+.subject-card-link:hover {
+  color: var(--color-dark-soft);
+}
+
+/* =========================
+   ACADEMIC DETAIL
+========================= */
+
+.academic-detail-page {
+  min-height: 850px;
+  padding: 80px 8% 120px;
+
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+.academic-detail-page .back-link {
+  max-width: 980px;
+  margin: 0 auto 75px;
+}
+
+.academic-detail-header {
+  max-width: 980px;
+  margin: 0 auto 65px;
+}
+
+.academic-detail-header h1 {
+  max-width: 850px;
+  margin: 15px 0 0;
+
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: clamp(46px, 7vw, 82px);
+  line-height: 0.94;
+  letter-spacing: -4px;
+}
+
+.academic-detail-header p {
+  max-width: 700px;
+  margin: 30px 0 0;
+
+  color: var(--color-text-muted);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.academic-detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  gap: 75px;
+
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.academic-detail-main {
+  max-width: 700px;
+  padding-top: 35px;
+
+  border-top: 1px solid var(--color-border-alt);
+}
+
+.academic-detail-label {
+  color: var(--color-accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.academic-detail-main p {
+  margin: 22px 0 0;
+
+  color: var(--color-text-muted);
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.academic-detail-aside {
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+  gap: 9px;
+
+  padding-left: 24px;
+  border-left: 1px solid var(--color-border-alt);
+}
+
+.academic-detail-aside span {
+  margin-top: 12px;
+
+  color: var(--color-text-soft);
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.academic-detail-aside strong {
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: 22px;
+}
+
+.academic-not-found {
+  min-height: 650px;
+  padding: 120px 8%;
+  text-align: center;
+}
+
+.academic-not-found h1 {
+  margin: 15px 0;
+
+  color: var(--color-text);
+  font-family: var(--font-heading);
+  font-size: 52px;
+}
+
+.academic-not-found p {
+  margin-bottom: 25px;
+  color: var(--color-text-muted);
+}
+
+.academic-page a:focus-visible,
+.academic-detail-page a:focus-visible {
+  outline: 3px solid rgba(114, 185, 71, 0.7);
+  outline-offset: 4px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 900px) {
+  .academic-page-intro {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .academic-page-summary {
+    width: fit-content;
+  }
+
+  .subjects-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .academic-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 45px;
+  }
+
+  .academic-detail-aside {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    padding: 25px 0 0;
+    border-top: 1px solid var(--color-border-alt);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .academic-page,
+  .academic-detail-page {
+    padding: 70px 5% 90px;
+  }
+
+  .academic-page-intro h1,
+  .academic-detail-header h1 {
+    font-size: 52px;
+    letter-spacing: -2.5px;
+  }
+
+  .academic-page-intro p,
+  .academic-detail-header p {
+    font-size: 16px;
+  }
+
+  .academic-notice {
+    align-items: start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .semester-heading {
+    grid-template-columns: 50px 1fr;
+    gap: 15px;
+  }
+
+  .semester-heading > span {
+    font-size: 32px;
+  }
+
+  .semester-heading > strong {
+    grid-column: 2;
+  }
+
+  .subjects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .subject-card {
+    min-height: 240px;
+  }
+
+  .academic-detail-layout {
+    gap: 35px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subject-card {
+    transition: none;
+  }
+
+  .subject-card:hover {
+    transform: none;
+  }
+}
+
+
+
+/* ===== Bloque original: líneas 6863-6892 ===== */
+.academic-page-intro,
+.academic-notice,
+.semester-heading,
+.subject-reveal {
+  width: 100%;
+  min-width: 0;
+}
+
+.subjects-grid > .subject-reveal {
+  display: flex;
+  min-width: 0;
+}
+
+.subjects-grid > .subject-reveal > .subject-card {
+  width: 100%;
+}
+
+.subject-card {
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .academic-page-intro,
+  .academic-notice,
+  .semester-heading,
+  .subject-reveal {
+    transform: none;
+  }
+}

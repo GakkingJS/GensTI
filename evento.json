@@ -1,0 +1,9 @@
+{
+  "period_id": "aee31447-0ec3-4ae0-b8e9-ce8cee1543bc",
+  "title": "Pago de matrícula ordinaria",
+  "description": "Plazo para realizar el pago de matrícula ordinaria.",
+  "starts_at": "2026-08-01T00:00:00Z",
+  "ends_at": "2026-08-15T23:59:59Z",
+  "campus": "Ibagué",
+  "audience": "Estudiantes de Ingeniería de Sistemas"
+}

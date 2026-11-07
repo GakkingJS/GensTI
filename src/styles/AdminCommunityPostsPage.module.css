@@ -1,0 +1,378 @@
+.page {
+  --ink: #161513;
+  --ink-soft: #5d5a55;
+  --paper: #f6f3ee;
+  --card: #ffffff;
+  --line: #e3ddd4;
+  --accent: #b4552d;
+  --accent-soft: #f3e3da;
+  --success: #22703f;
+  --success-soft: #e2f2e7;
+  --warning: #8a6100;
+  --warning-soft: #fdf0cd;
+  --danger: #a53030;
+  --danger-soft: #fbe6e6;
+
+  min-height: 100vh;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: clamp(2.5rem, 6vw, 5rem) clamp(1.1rem, 4vw, 2.5rem) 6rem;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 88% 8%, rgba(180, 85, 45, 0.08), transparent 32%),
+    var(--paper);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 240px);
+  align-items: end;
+  gap: 2rem;
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.eyebrow::before {
+  content: "";
+  width: 28px;
+  height: 2px;
+  background: currentColor;
+  animation: lineGrow 0.8s ease both;
+}
+
+.title {
+  max-width: 720px;
+  margin: 0 0 1rem;
+  font-size: clamp(2.1rem, 5.5vw, 3.4rem);
+  line-height: 1.04;
+  letter-spacing: -0.035em;
+  animation: riseIn 0.7s ease both;
+}
+
+.description {
+  max-width: 580px;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 1.02rem;
+  line-height: 1.65;
+  animation: riseIn 0.7s 0.08s ease both;
+}
+
+.filter {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  box-shadow: 0 10px 24px rgba(22, 21, 19, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.filter:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.errorMessage {
+  margin: 0 0 1.5rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 4px solid var(--danger);
+  border-radius: 0.5rem;
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.list {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.card {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(1.4rem, 3vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: 1.35rem;
+  background: var(--card);
+  box-shadow: 0 16px 38px rgba(22, 21, 19, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  animation: cardIn 0.55s ease both;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  background: var(--line);
+  transition: background 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: #d5cdc2;
+  box-shadow: 0 24px 52px rgba(22, 21, 19, 0.1);
+}
+
+.card:hover::before {
+  background: var(--accent);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.category {
+  padding: 0.38rem 0.8rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.statusBadge {
+  padding: 0.38rem 0.8rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.pending {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.published {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.rejected {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.postTitle {
+  margin: 0 0 0.7rem;
+  font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.postContent {
+  margin: 0;
+  max-width: 72ch;
+  color: var(--ink-soft);
+  line-height: 1.65;
+  white-space: pre-line;
+}
+
+.reviewActions {
+  margin-top: 1.6rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 1rem;
+}
+
+.noteLabel {
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.noteTextarea {
+  width: 100%;
+  min-height: 96px;
+  padding: 0.95rem 1.05rem;
+  border: 1px solid var(--line);
+  border-radius: 0.85rem;
+  background: #fbfaf8;
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.55;
+  resize: vertical;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.noteTextarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.reviewButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.approveButton,
+.rejectButton,
+.deleteButton {
+  padding: 0.78rem 1.35rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.approveButton {
+  background: var(--success);
+  color: white;
+}
+
+.rejectButton {
+  background: transparent;
+  border-color: rgba(165, 48, 48, 0.35);
+  color: var(--danger);
+}
+
+.approveButton:hover,
+.rejectButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(22, 21, 19, 0.12);
+}
+
+.approveButton:active,
+.rejectButton:active,
+.deleteButton:active {
+  transform: translateY(0);
+}
+
+.deleteButton {
+  margin-top: 1.4rem;
+  background: transparent;
+  border-color: var(--line);
+  color: var(--ink-soft);
+}
+
+.deleteButton:hover {
+  border-color: rgba(165, 48, 48, 0.4);
+  color: var(--danger);
+}
+
+.approveButton:disabled,
+.rejectButton:disabled,
+.deleteButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.emptyState {
+  padding: clamp(2rem, 6vw, 3.5rem);
+  border: 1px dashed #d5cdc2;
+  border-radius: 1.35rem;
+  background: rgba(255, 255, 255, 0.55);
+  text-align: center;
+  color: var(--ink-soft);
+  animation: riseIn 0.5s ease both;
+}
+
+@keyframes riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes lineGrow {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 28px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header,
+  .card,
+  .emptyState,
+  .eyebrow::before {
+    animation: none;
+  }
+
+  .card,
+  .approveButton,
+  .rejectButton,
+  .deleteButton {
+    transition: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .header {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .filter {
+    max-width: 360px;
+  }
+}
+
+@media (max-width: 520px) {
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .reviewButtons {
+    width: 100%;
+  }
+
+  .approveButton,
+  .rejectButton,
+  .deleteButton {
+    width: 100%;
+  }
+}

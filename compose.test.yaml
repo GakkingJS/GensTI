@@ -1,0 +1,36 @@
+services:
+  db_test:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: gensti_test
+      POSTGRES_PASSWORD_FILE: /run/secrets/gensti_test_password
+      POSTGRES_DB: gensti_test
+    secrets:
+      - gensti_test_password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gensti_test -d gensti_test"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  tests:
+    build:
+      context: ./backend
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    environment:
+      TEST_DATABASE_HOST: db_test
+      TEST_DATABASE_NAME: gensti_test
+      TEST_DATABASE_USER: gensti_test
+      TEST_DATABASE_PASSWORD_FILE: /run/secrets/gensti_test_password
+    secrets:
+      - gensti_test_password
+    depends_on:
+      db_test:
+        condition: service_healthy
+    command: ["python", "-m", "pytest", "-q", "tests"]
+
+secrets:
+  gensti_test_password:
+    file: ./secrets/gensti_test_password.txt

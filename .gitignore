@@ -1,0 +1,56 @@
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Credenciales locales de GENSTI
+.env
+.env.*
+!.env.example
+secrets/
+
+# Entorno virtual y archivos generados de Python
+backend/.venv/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# PostgreSQL: datos y respaldos locales
+postgres_data/
+pgdata/
+docker-data/
+*.dump
+*.bak
+*.sqlite3
+
+# Archivos temporales
+*.tmp
+*.temp
+
+
+cookies.txt

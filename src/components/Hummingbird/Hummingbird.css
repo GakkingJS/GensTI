@@ -1,0 +1,7 @@
+.hummingbird {
+  width: 260px;
+  height: 260px;
+  pointer-events: none;
+  position: relative;
+  z-index: 2;
+}

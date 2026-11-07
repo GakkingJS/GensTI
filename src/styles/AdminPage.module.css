@@ -1,0 +1,916 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap");
+
+/* ==========================================================================
+   AdminPage — GENSTI
+   Idea: agua. Todo respira lento (mareas, ondas, órbitas) y el hover
+   "llena" la tarjeta como una marea que sube.
+   ========================================================================== */
+
+.adminPage {
+  --bg: #eaf6f2;
+  --surface: rgba(255, 255, 255, 0.72);
+  --ink: #08333a;
+  --muted: #40676c;
+  --line: rgba(8, 51, 58, 0.12);
+
+  --teal: #0fa3a3;
+  --aqua: #2bd0b5;
+  --green: #34c77b;
+  --blue: #1d8fd1;
+
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  position: relative;
+  min-height: 100vh;
+  padding: clamp(1.25rem, 4vw, 3.5rem);
+  padding-top: clamp(2rem, 5vw, 4rem);
+  overflow-x: clip;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+  isolation: isolate;
+}
+
+.adminPage > header,
+.adminPage > section,
+.adminPage > footer {
+  position: relative;
+  z-index: 1;
+  max-width: 1240px;
+  margin-inline: auto;
+}
+
+/* ---------- Fondo vivo ---------- */
+
+.ambientLight {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambientLight::before,
+.ambientLight::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.55;
+}
+
+.ambientLight::before {
+  width: 46vw;
+  height: 46vw;
+  top: -14vw;
+  right: -8vw;
+  background: radial-gradient(circle, var(--aqua), transparent 68%);
+  animation: drift 22s ease-in-out infinite alternate;
+}
+
+.ambientLight::after {
+  width: 40vw;
+  height: 40vw;
+  bottom: -12vw;
+  left: -10vw;
+  background: radial-gradient(circle, var(--green), transparent 68%);
+  opacity: 0.35;
+  animation: drift 28s ease-in-out infinite alternate-reverse;
+}
+
+.gridTexture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, #000 0%, transparent 62%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, transparent 62%);
+  opacity: 0.55;
+}
+
+/* ==========================================================================
+   HERO
+   ========================================================================== */
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 5rem);
+  padding-bottom: clamp(3rem, 7vw, 6rem);
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Secuencia de entrada: el único "momento orquestado" de la página */
+.eyebrow,
+.heroTitle,
+.heroDescription,
+.sessionBadge {
+  animation: surface 0.9s var(--ease-out) backwards;
+}
+.eyebrow { animation-delay: 0.05s; }
+.heroTitle { animation-delay: 0.18s; }
+.heroDescription { animation-delay: 0.34s; }
+.sessionBadge { animation-delay: 0.48s; }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.9rem 0.4rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  backdrop-filter: blur(8px);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--teal);
+}
+
+.statusDot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.statusDot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--green);
+  animation: ping 2.2s ease-out infinite;
+}
+
+.heroTitle {
+  margin: 1.4rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(3.4rem, 9vw, 7rem);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  color: var(--ink);
+}
+
+/* La palabra "control." se rellena con un agua que se mueve */
+.heroTitle span {
+  display: inline-block;
+  padding-bottom: 0.08em;
+  background: linear-gradient(
+    100deg,
+    var(--teal) 0%,
+    var(--aqua) 30%,
+    var(--green) 55%,
+    var(--blue) 80%,
+    var(--teal) 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: flow 9s linear infinite;
+}
+
+.heroDescription {
+  max-width: 34ch;
+  margin: 1.6rem 0 0;
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  color: var(--muted);
+}
+
+.sessionBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 2rem;
+  padding: 0.55rem 1.1rem 0.55rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px -18px rgba(8, 51, 58, 0.45);
+  max-width: 100%;
+}
+
+.sessionIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--green));
+  color: #fff;
+}
+
+.sessionText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.sessionText small {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+}
+
+.sessionText strong {
+  font-size: 0.95rem;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.onlineDot {
+  position: relative;
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.onlineDot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--green);
+  animation: ping 2.2s ease-out infinite 0.6s;
+}
+
+/* ---------- Visual: núcleo con ondas y órbitas ---------- */
+
+.heroVisual {
+  position: relative;
+  width: min(100%, 440px);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  display: grid;
+  place-items: center;
+  animation: surface 1.2s var(--ease-out) 0.3s backwards;
+}
+
+.orbit {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--teal) 28%, transparent);
+  animation: spin linear infinite;
+}
+
+/* Cada órbita lleva un "satélite" */
+.orbit::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -6px;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--aqua);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--aqua) 25%, transparent);
+}
+
+.orbitOne {
+  width: 52%;
+  height: 52%;
+  animation-duration: 14s;
+}
+
+.orbitTwo {
+  width: 76%;
+  height: 76%;
+  border-style: dashed;
+  animation-duration: 26s;
+  animation-direction: reverse;
+}
+.orbitTwo::after {
+  background: var(--green);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--green) 25%, transparent);
+}
+
+.orbitThree {
+  width: 100%;
+  height: 100%;
+  animation-duration: 40s;
+}
+.orbitThree::after {
+  background: var(--blue);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--blue) 25%, transparent);
+}
+
+.visualCore {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 30%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #7ff0d8, var(--teal) 62%, #0a6f7a);
+  color: #fff;
+  box-shadow:
+    0 20px 50px -12px color-mix(in srgb, var(--teal) 70%, transparent),
+    inset 0 -8px 18px rgba(0, 0, 0, 0.12);
+  animation: breathe 5s ease-in-out infinite;
+}
+
+/* Ondas que salen del núcleo */
+.visualCore::before,
+.visualCore::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--aqua);
+  opacity: 0;
+  animation: ripple 4.5s ease-out infinite;
+}
+.visualCore::after {
+  animation-delay: 2.25s;
+}
+
+.floatIcon {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px 16px 16px 5px;
+  background: #fff;
+  color: var(--teal);
+  box-shadow: 0 14px 30px -14px rgba(8, 51, 58, 0.5);
+  animation: bob 6s ease-in-out infinite;
+}
+
+.floatIconOne {
+  top: 12%;
+  right: 8%;
+}
+
+.floatIconTwo {
+  bottom: 18%;
+  left: 4%;
+  color: var(--green);
+  animation-delay: -3s;
+  animation-duration: 7.5s;
+}
+
+.visualCaption {
+  position: absolute;
+  bottom: 2%;
+  right: 6%;
+  display: flex;
+  flex-direction: column;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  line-height: 1.2;
+}
+
+.visualCaption span {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.visualCaption small {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* ==========================================================================
+   SECCIÓN DE MÓDULOS
+   ========================================================================== */
+
+.modulesSection {
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.headingLeft {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.headingIcon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px 16px 16px 5px;
+  background: var(--ink);
+  color: var(--aqua);
+}
+
+.sectionKicker {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--teal);
+}
+
+.headingLeft h2 {
+  margin: 0.1rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+.headingLeft p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.moduleCount {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--green) 16%, transparent);
+  color: #11623a;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.moduleCount span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: beat 1.8s ease-in-out infinite;
+}
+
+/* ---------- Estado vacío ---------- */
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  max-width: 520px;
+  margin: 2rem auto;
+  padding: 2.5rem 2rem;
+  border: 1.5px dashed color-mix(in srgb, var(--teal) 40%, transparent);
+  border-radius: 28px;
+  background: var(--surface);
+  text-align: center;
+  color: var(--teal);
+}
+
+.emptyState h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--ink);
+}
+
+.emptyState p {
+  margin: 0;
+  color: var(--muted);
+}
+
+/* ==========================================================================
+   TARJETAS
+   La marea sube al pasar el cursor (o al enfocar con teclado).
+   ========================================================================== */
+
+.adminActions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 1.25rem;
+}
+
+.adminActionCard {
+  /* Variables de color: las define cada clase de color más abajo */
+  --c: var(--teal);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  min-height: 290px;
+  padding: 1.4rem;
+  overflow: hidden;
+  border: 1.5px solid color-mix(in srgb, var(--c) 26%, transparent);
+  /* Esquina inferior izquierda más cerrada: eco del icono */
+  border-radius: 30px 30px 30px 10px;
+  background: var(--surface);
+  backdrop-filter: blur(10px);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    transform 0.5s var(--ease-out),
+    border-color 0.4s ease,
+    box-shadow 0.5s var(--ease-out);
+  animation: surface 0.8s var(--ease-out) backwards;
+  animation-delay: calc(0.5s + var(--card-index, 0) * 90ms);
+}
+
+.adminActionCard > * {
+  position: relative;
+  z-index: 1;
+}
+
+.adminActionCard:hover,
+.adminActionCard:focus-visible {
+  transform: translateY(-6px);
+  border-color: var(--c);
+  box-shadow: 0 28px 50px -26px color-mix(in srgb, var(--c) 80%, #000);
+}
+
+.adminActionCard:focus-visible {
+  outline: 3px solid var(--c);
+  outline-offset: 4px;
+}
+
+.adminActionCard:active {
+  transform: translateY(-2px) scale(0.99);
+}
+
+/* Paleta por módulo — verdes y azules aguamarina */
+.cyan   { --c: #0e9fb5; }
+.aqua   { --c: #11b49f; }
+.blue   { --c: #2a7dd1; }
+.mint   { --c: #2fbf74; }
+.sky    { --c: #3aa5dd; }
+.violet { --c: #4a63c9; }
+
+/* ---------- La marea ---------- */
+
+.adminActionCard > .cardGlow {
+  position: absolute;
+  z-index: 0;
+  left: -30%;
+  top: 100%;
+  width: 160%;
+  aspect-ratio: 1;
+  pointer-events: none;
+  transition: top 0.9s var(--ease-out);
+}
+
+.cardGlow::before,
+.cardGlow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 43%;
+  animation: spin 9s linear infinite;
+}
+
+.cardGlow::before {
+  background: color-mix(in srgb, var(--c) 17%, transparent);
+}
+
+.cardGlow::after {
+  border-radius: 40%;
+  background: color-mix(in srgb, var(--c) 11%, transparent);
+  animation-duration: 13s;
+  animation-direction: reverse;
+}
+
+.adminActionCard:hover > .cardGlow,
+.adminActionCard:focus-visible > .cardGlow {
+  top: 46%;
+}
+
+/* ---------- Contenido de la tarjeta ---------- */
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cardNumber {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--c) 70%, var(--ink));
+}
+
+.cardCategory {
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+  color: color-mix(in srgb, var(--c) 55%, var(--ink));
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.cardIcon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 18px 18px 18px 6px;
+  background: var(--c);
+  color: #fff;
+  box-shadow: 0 14px 26px -14px var(--c);
+  transition: transform 0.6s var(--ease-out), border-radius 0.6s var(--ease-out);
+}
+
+.adminActionCard:hover .cardIcon,
+.adminActionCard:focus-visible .cardIcon {
+  transform: rotate(-8deg) scale(1.08);
+  border-radius: 18px 18px 6px 18px;
+}
+
+.cardCopy {
+  flex: 1;
+}
+
+.cardCopy h3 {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.cardCopy p {
+  margin: 0;
+  max-width: 32ch;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.cardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.permissionTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.6);
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.cardArrow {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid color-mix(in srgb, var(--c) 40%, transparent);
+  border-radius: 50%;
+  color: var(--c);
+  overflow: hidden;
+  transition:
+    background 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    transform 0.5s var(--ease-out);
+}
+
+.cardArrow svg {
+  transition: transform 0.5s var(--ease-out);
+}
+
+.adminActionCard:hover .cardArrow,
+.adminActionCard:focus-visible .cardArrow {
+  background: var(--c);
+  border-color: var(--c);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.adminActionCard:hover .cardArrow svg,
+.adminActionCard:focus-visible .cardArrow svg {
+  transform: translate(2px, -2px);
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+
+.adminFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.footerBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--teal);
+}
+
+.footerBrand strong {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.footerBrand span {
+  color: var(--muted);
+}
+
+.footerMessage {
+  font-style: italic;
+}
+
+/* ==========================================================================
+   KEYFRAMES
+   ========================================================================== */
+
+@keyframes surface {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes flow {
+  to {
+    background-position: -220% 0;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(5vw, 4vw) scale(1.12);
+  }
+}
+
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(3.6);
+    opacity: 0;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(3deg);
+  }
+}
+
+@keyframes beat {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.7);
+    opacity: 0.5;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .heroVisual {
+    width: min(78%, 340px);
+    order: -1;
+    margin-inline: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .adminPage {
+    padding-inline: 1rem;
+  }
+
+  .heroVisual {
+    width: min(70%, 260px);
+  }
+
+  .visualCaption {
+    display: none;
+  }
+
+  .adminActionCard {
+    min-height: 260px;
+  }
+
+  .adminFooter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ==========================================================================
+   ACCESIBILIDAD: movimiento reducido
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .adminPage *,
+  .adminPage *::before,
+  .adminPage *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .heroTitle span {
+    -webkit-text-fill-color: initial;
+    background: none;
+    color: var(--teal);
+  }
+}

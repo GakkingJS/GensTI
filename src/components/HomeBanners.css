@@ -1,0 +1,1074 @@
+/* ================================
+   HOMEBANNERS - gensTI
+================================ */
+
+.home-banners {
+  width: 100%;
+  padding: 48px 6%;
+  background: var(--color-bg, #f7f9f8);
+  box-sizing: border-box;
+}
+
+.home-banner {
+  --banner-accent: #58e0c1;
+
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+
+  width: 100%;
+  min-height: 370px;
+  padding: 58px 7%;
+  overflow: hidden;
+
+  color: #ffffff;
+  background: #102c32;
+  border-radius: 24px;
+  box-sizing: border-box;
+
+  animation: banner-appear 0.65s ease both;
+}
+
+/* Variantes visuales */
+
+.banner--community {
+  --banner-accent: #58e0c1;
+  background:
+    radial-gradient(
+      circle at 85% 45%,
+      rgba(49, 190, 159, 0.22),
+      transparent 32%
+    ),
+    linear-gradient(115deg, #102c32 0%, #16434a 100%);
+}
+
+.banner--technology {
+  --banner-accent: #8bd8ff;
+  background:
+    radial-gradient(
+      circle at 85% 45%,
+      rgba(63, 158, 226, 0.25),
+      transparent 32%
+    ),
+    linear-gradient(115deg, #142839 0%, #1a3e55 100%);
+}
+
+.banner--future {
+  --banner-accent: #ffd47a;
+  background:
+    radial-gradient(
+      circle at 85% 45%,
+      rgba(255, 174, 66, 0.22),
+      transparent 32%
+    ),
+    linear-gradient(115deg, #30271e 0%, #57402a 100%);
+}
+
+/* Decoración de fondo */
+
+.home-banner::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 360px;
+  height: 360px;
+  right: 8%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.home-banner::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 500px;
+  height: 500px;
+  right: 2%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  border-radius: 50%;
+}
+
+/* Texto */
+
+.home-banner__content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  max-width: 600px;
+}
+
+.home-banner__eyebrow {
+  display: inline-block;
+  margin-bottom: 20px;
+  color: var(--banner-accent);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2.5px;
+  line-height: 1.5;
+}
+
+.home-banner__content h2 {
+  max-width: 590px;
+  margin: 0 0 20px;
+  color: #ffffff;
+  font-size: clamp(30px, 3.5vw, 48px);
+  font-weight: 750;
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+}
+
+.home-banner__content p {
+  max-width: 520px;
+  margin: 0 0 30px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 15px;
+  line-height: 1.85;
+}
+
+/* Botón */
+
+.home-banner__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+
+  min-height: 48px;
+  padding: 0 23px;
+
+  color: #102c32;
+  background: var(--banner-accent);
+  border: 1px solid transparent;
+  border-radius: 8px;
+
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.home-banner__button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+}
+
+.home-banner__button:focus-visible,
+.banner-arrow:focus-visible,
+.banner-dot:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 4px;
+}
+
+/* Ilustración tecnológica */
+
+.home-banner__visual {
+  position: relative;
+  flex: 0 0 290px;
+  width: 290px;
+  height: 290px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-orbit {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+.banner-orbit--outer {
+  width: 260px;
+  height: 260px;
+  transform: rotate(-25deg) scaleY(0.65);
+  border-color: var(--banner-accent);
+  opacity: 0.7;
+  animation: orbit-rotate 18s linear infinite;
+}
+
+.banner-orbit--inner {
+  width: 205px;
+  height: 205px;
+  transform: rotate(35deg) scaleY(0.7);
+  border-style: dashed;
+  opacity: 0.45;
+  animation: orbit-rotate 24s linear infinite reverse;
+}
+
+.banner-core {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 125px;
+  height: 125px;
+
+  color: var(--banner-accent);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 32px;
+
+  box-shadow:
+    0 0 50px rgba(88, 224, 193, 0.08),
+    inset 0 0 30px rgba(255, 255, 255, 0.035);
+
+  transform: rotate(-8deg);
+}
+
+.banner-core span {
+  font-family: monospace;
+  font-size: 37px;
+  font-weight: 800;
+  transform: rotate(8deg);
+}
+
+.banner-floating {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 48px;
+  height: 48px;
+
+  color: var(--banner-accent);
+  background: #193b42;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+
+  font-size: 14px;
+  font-weight: 800;
+
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  animation: floating 4s ease-in-out infinite;
+}
+
+.banner-floating--one {
+  top: 26px;
+  left: 25px;
+}
+
+.banner-floating--two {
+  right: 16px;
+  top: 90px;
+  animation-delay: -1.3s;
+}
+
+.banner-floating--three {
+  left: 48px;
+  bottom: 25px;
+  animation-delay: -2.2s;
+}
+
+/* Controles del carrusel */
+
+.home-banner__controls {
+  position: absolute;
+  z-index: 3;
+  left: 7%;
+  bottom: 22px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.banner-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+  padding: 0;
+
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+
+  font-size: 23px;
+  line-height: 1;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.banner-arrow:hover {
+  color: #102c32;
+  background: var(--banner-accent);
+}
+
+.banner-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.banner-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+
+  background: rgba(255, 255, 255, 0.35);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+
+  transition:
+    width 0.25s ease,
+    background 0.25s ease;
+}
+
+.banner-dot.is-active {
+  width: 24px;
+  background: var(--banner-accent);
+}
+
+/* Animaciones */
+
+@keyframes banner-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floating {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes orbit-rotate {
+  from {
+    rotate: 0deg;
+  }
+
+  to {
+    rotate: 360deg;
+  }
+}
+
+/* Tabletas */
+
+@media (max-width: 900px) {
+  .home-banners {
+    padding: 35px 5%;
+  }
+
+  .home-banner {
+    min-height: 340px;
+    padding: 45px 6%;
+    gap: 15px;
+  }
+
+  .home-banner__content {
+    max-width: 520px;
+  }
+
+  .home-banner__visual {
+    flex-basis: 220px;
+    width: 220px;
+    height: 240px;
+    transform: scale(0.85);
+  }
+
+  .home-banner__content h2 {
+    font-size: clamp(28px, 4vw, 38px);
+  }
+
+  .home-banner__content p {
+    font-size: 14px;
+  }
+
+  .home-banner__controls {
+    left: 6%;
+  }
+}
+
+/* Celulares */
+
+@media (max-width: 650px) {
+  .home-banners {
+    padding: 25px 5%;
+  }
+
+  .home-banner {
+    display: block;
+    min-height: 510px;
+    padding: 35px 25px 90px;
+    border-radius: 18px;
+  }
+
+  .home-banner__content {
+    max-width: 100%;
+  }
+
+  .home-banner__eyebrow {
+    margin-bottom: 15px;
+    font-size: 10px;
+    letter-spacing: 1.8px;
+  }
+
+  .home-banner__content h2 {
+    margin-bottom: 15px;
+    font-size: clamp(29px, 8vw, 38px);
+    letter-spacing: -0.8px;
+  }
+
+  .home-banner__content p {
+    margin-bottom: 22px;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .home-banner__button {
+    min-height: 45px;
+    padding: 0 17px;
+    font-size: 12px;
+  }
+
+  .home-banner__visual {
+    position: absolute;
+    right: -35px;
+    bottom: 2px;
+
+    width: 170px;
+    height: 150px;
+
+    transform: scale(0.65);
+    transform-origin: bottom right;
+    opacity: 0.65;
+  }
+
+  .banner-orbit--outer {
+    width: 230px;
+    height: 230px;
+  }
+
+  .banner-orbit--inner {
+    width: 180px;
+    height: 180px;
+  }
+
+  .banner-core {
+    width: 110px;
+    height: 110px;
+  }
+
+  .home-banner__controls {
+    left: 25px;
+    bottom: 24px;
+  }
+
+  .home-banner::before {
+    right: -120px;
+    top: auto;
+    bottom: -100px;
+    transform: none;
+  }
+
+  .home-banner::after {
+    display: none;
+  }
+}
+
+/* Accesibilidad: reducir movimiento si el usuario lo prefiere */
+
+@media (prefers-reduced-motion: reduce) {
+  .home-banner,
+  .banner-orbit,
+  .banner-floating {
+    animation: none !important;
+  }
+
+  .home-banner__button,
+  .banner-arrow,
+  .banner-dot {
+    transition: none;
+  }
+}
+
+
+
+/* ===== HOME BANNERS: MEJORAS DE EXPERIENCIA ===== */
+
+.home-banners {
+  font-family: "Nunito Sans", "Segoe UI", sans-serif;
+}
+
+.home-banner {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #102b27;
+  color: #ffffff;
+}
+
+/* Solo entra el contenido nuevo; el fondo no se reinicia. */
+.home-banner__content {
+  position: relative;
+  z-index: 2;
+  animation: banner-content-enter 420ms ease-out both;
+}
+
+.home-banner__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 1.1rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  opacity: 0.88;
+}
+
+.home-banner__eyebrow::before {
+  content: "";
+  display: inline-block;
+  width: 24px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.home-banner__content h2 {
+  max-width: 680px;
+  margin: 0 0 1.15rem;
+  font-family: "Nunito Sans", "Segoe UI", sans-serif;
+  font-size: clamp(2rem, 4vw, 3.45rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.home-banner__content p {
+  max-width: 560px;
+  margin: 0 0 1.8rem;
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
+  font-weight: 400;
+  line-height: 1.8;
+  opacity: 0.88;
+  text-wrap: pretty;
+}
+
+.home-banner__button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.3rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: #f2d477;
+  color: #18342d;
+  font-size: 0.96rem;
+  font-weight: 800;
+  line-height: 1.3;
+  text-decoration: none;
+  box-shadow: 0 5px 16px rgb(0 0 0 / 10%);
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.home-banner__button:hover {
+  background: #ffe59a;
+  color: #102b27;
+  box-shadow: 0 9px 22px rgb(0 0 0 / 16%);
+  transform: translateY(-2px);
+}
+
+.home-banner__button:active {
+  transform: translateY(0);
+}
+
+.home-banner__button:focus-visible,
+.banner-arrow:focus-visible,
+.banner-dot:focus-visible {
+  outline: 3px solid #ffffff;
+  outline-offset: 4px;
+}
+
+.home-banner__controls {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.banner-arrow {
+  display: inline-grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 8%);
+  color: #ffffff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease;
+}
+
+.banner-arrow:hover {
+  border-color: #f2d477;
+  background: rgb(255 255 255 / 17%);
+  transform: scale(1.05);
+}
+
+.banner-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.banner-dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 48%);
+  cursor: pointer;
+  transition:
+    width 220ms ease,
+    background-color 220ms ease;
+}
+
+.banner-dot.is-active {
+  width: 28px;
+  background: #f2d477;
+}
+
+@keyframes banner-content-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .home-banner__content h2 {
+    font-size: clamp(1.85rem, 8vw, 2.5rem);
+    line-height: 1.16;
+  }
+
+  .home-banner__content p {
+    font-size: 0.98rem;
+    line-height: 1.7;
+  }
+
+  .home-banner__button {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .home-banner__controls {
+    gap: 0.65rem;
+  }
+
+  .banner-arrow {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-banner__content {
+    animation: none;
+  }
+
+  .home-banner__button,
+  .banner-arrow,
+  .banner-dot {
+    transition: none;
+  }
+}
+
+
+/* Navegación refinada del carrusel GENSTI */
+
+.home-banner__controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.banner-arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  flex: 0 0 46px;
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 9%);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    transform 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.banner-arrow:hover {
+  background: #f2d477;
+  border-color: #f2d477;
+  color: #18342d;
+  transform: scale(1.07);
+  box-shadow: 0 5px 18px rgb(0 0 0 / 15%);
+}
+
+.banner-arrow:active {
+  transform: scale(0.96);
+}
+
+.banner-arrow:focus-visible,
+.banner-dot:focus-visible {
+  outline: 3px solid #f2d477;
+  outline-offset: 4px;
+}
+
+.banner-arrow svg {
+  display: block;
+}
+
+.banner-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 13px;
+  border: 1px solid rgb(255 255 255 / 13%);
+  border-radius: 30px;
+  background: rgb(0 0 0 / 10%);
+}
+
+.banner-dot {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: none;
+  border-radius: 20px;
+  background: rgb(255 255 255 / 48%);
+  cursor: pointer;
+  transition:
+    width 240ms ease,
+    background-color 240ms ease;
+}
+
+.banner-dot.is-active {
+  width: 24px;
+  background: #f2d477;
+}
+
+@media (max-width: 640px) {
+  .home-banner__controls {
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .banner-arrow {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+  }
+
+  .banner-dots {
+    gap: 7px;
+    padding: 9px 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .banner-arrow,
+  .banner-dot {
+    transition: none;
+  }
+}
+
+
+/* GENSTI: navegación minimalista tipo streaming */
+
+.home-banner {
+  min-height: 390px;
+  border-radius: 22px;
+}
+
+.home-banner__controls {
+  position: absolute;
+  z-index: 5;
+  right: 32px;
+  bottom: 25px;
+  left: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0;
+}
+
+.banner-progress {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.banner-progress__item {
+  display: flex;
+  width: 42px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.banner-progress__track {
+  display: block;
+  width: 100%;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 36%);
+  transition:
+    height 180ms ease,
+    background-color 180ms ease;
+}
+
+.banner-progress__fill {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: #f2d477;
+}
+
+.banner-progress__item.is-active .banner-progress__track {
+  height: 4px;
+  background: rgb(255 255 255 / 30%);
+}
+
+.banner-progress__item.is-active .banner-progress__fill {
+  width: 100%;
+}
+
+.banner-progress__item:hover .banner-progress__track {
+  height: 5px;
+  background: rgb(255 255 255 / 60%);
+}
+
+.banner-progress__item:focus-visible {
+  outline: 2px solid #f2d477;
+  outline-offset: 2px;
+  border-radius: 5px;
+}
+
+.banner-counter {
+  color: rgb(255 255 255 / 85%);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums;
+}
+
+.banner-counter__separator {
+  color: rgb(255 255 255 / 45%);
+  margin: 0 3px;
+}
+
+@media (max-width: 640px) {
+  .home-banner {
+    min-height: 430px;
+    border-radius: 16px;
+  }
+
+  .home-banner__controls {
+    right: 18px;
+    bottom: 18px;
+    left: 18px;
+  }
+
+  .banner-progress {
+    gap: 4px;
+  }
+
+  .banner-progress__item {
+    width: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .banner-progress__track {
+    transition: none;
+  }
+}
+
+
+/* Evita que el contenido cambie de tamaño entre banners */
+
+.home-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  align-items: center;
+  position: relative;
+}
+
+/* Mantiene fija la geometría del bloque izquierdo */
+.home-banner__content {
+  width: 100%;
+  min-width: 0;
+  max-width: 620px;
+  align-self: center;
+  box-sizing: border-box;
+}
+
+/* Los títulos comparten un tamaño y una altura consistentes */
+.home-banner__content h2 {
+  width: 100%;
+  min-height: 2.24em;
+  margin-top: 0;
+  font-size: clamp(2rem, 3.5vw, 3.25rem);
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+/* Las descripciones mantienen el mismo espacio */
+.home-banner__content p {
+  width: 100%;
+  min-height: 5.1em;
+  line-height: 1.7;
+}
+
+/* Conserva el tamaño y la posición del botón */
+.home-banner__button {
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+/* Diseño adaptable a teléfonos */
+@media (max-width: 760px) {
+  .home-banner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-banner__content {
+    max-width: none;
+  }
+
+  .home-banner__content h2 {
+    min-height: 0;
+    font-size: clamp(1.9rem, 7vw, 2.6rem);
+  }
+
+  .home-banner__content p {
+    min-height: 0;
+  }
+}
+
+
+/* Tamaño uniforme para los tres banners de GENSTI */
+.home-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  width: 100%;
+  min-height: 440px;
+  box-sizing: border-box;
+}
+
+.home-banner__content {
+  width: 100%;
+  max-width: 600px;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.home-banner__content h2 {
+  width: 100%;
+  min-height: 2.5em;
+  font-size: clamp(2rem, 3.5vw, 3.25rem);
+  line-height: 1.15;
+}
+
+.home-banner__content p {
+  width: 100%;
+  min-height: 5em;
+  line-height: 1.7;
+}
+
+.home-banner__visual {
+  width: 100%;
+  min-width: 0;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 760px) {
+  .home-banner {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 500px;
+  }
+
+  .home-banner__content h2,
+  .home-banner__content p {
+    min-height: 0;
+  }
+
+  .home-banner__visual {
+    min-height: 180px;
+  }
+}
