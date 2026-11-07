@@ -2,8 +2,6 @@
 
 /* ==========================================================================
    Chatbot GENSTI — asistente universitario
-   Misma paleta que AdminPage: verde y azul aguamarina.
-   Clases globales (no es un CSS Module): impórtalo con  import "./chatbot.css"
    ========================================================================== */
 
 .chatbot-toggle,
