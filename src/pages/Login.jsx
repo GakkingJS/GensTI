@@ -1,6 +1,6 @@
-
 import { lazy, memo, Suspense, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import "./Login.css";
 import logoGensti from "../assets/logo-gensti.png";
 import { useAuth } from "../context/AuthContext";
@@ -12,15 +12,14 @@ const FloatingLines = memo(
 const ENABLED_WAVES = ["top", "middle", "bottom"];
 const LINES_GRADIENT = ["#00A6A6", "#2B8C85", "#72B947"];
 
-
 const TOP_WAVE_POSITION = { x: 10.0, y: 0.5, rotate: -0.4 };
 const MIDDLE_WAVE_POSITION = { x: 5.0, y: 0.0, rotate: 0.2 };
 const BOTTOM_WAVE_POSITION = { x: 2.0, y: -0.7, rotate: 0.4 };
 
-
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -84,25 +83,20 @@ function Login() {
       {/* Fondo animado */}
       <div className="login-background" aria-hidden="true">
         <Suspense fallback={null}>
-          
-            <FloatingLines
-              enabledWaves={ENABLED_WAVES}
-              lineCount={8}
-              lineDistance={8}
-              bendRadius={8}
-              bendStrength={-2}
-              interactive
-              parallax
-              animationSpeed={0.8}
-              linesGradient={LINES_GRADIENT}
-
-              topWavePosition={TOP_WAVE_POSITION}
-              middleWavePosition={MIDDLE_WAVE_POSITION}
-              bottomWavePosition={BOTTOM_WAVE_POSITION}
-
-            
-
-            />
+          <FloatingLines
+            enabledWaves={ENABLED_WAVES}
+            lineCount={8}
+            lineDistance={8}
+            bendRadius={8}
+            bendStrength={-2}
+            interactive
+            parallax
+            animationSpeed={0.8}
+            linesGradient={LINES_GRADIENT}
+            topWavePosition={TOP_WAVE_POSITION}
+            middleWavePosition={MIDDLE_WAVE_POSITION}
+            bottomWavePosition={BOTTOM_WAVE_POSITION}
+          />
         </Suspense>
       </div>
 
@@ -201,18 +195,47 @@ function Login() {
                 </button>
               </div>
 
-              <input
-                id="password"
-                name="password"
-                type="password"
-                placeholder="Ingresa tu contraseña"
-                value={password}
-                onChange={(event) =>
-                  setPassword(event.target.value)
-                }
-                autoComplete="current-password"
-                required
-              />
+              <div className="password-input">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Ingresa tu contraseña"
+                  value={password}
+                  onChange={(event) =>
+                    setPassword(event.target.value)
+                  }
+                  autoComplete="current-password"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  required
+                />
+
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword((value) => !value)}
+                  // Evita que el botón le quite el foco al campo al hacer clic
+                  onMouseDown={(event) => event.preventDefault()}
+                  aria-label={
+                    showPassword
+                      ? "Ocultar contraseña"
+                      : "Mostrar contraseña"
+                  }
+                  aria-pressed={showPassword}
+                  title={
+                    showPassword
+                      ? "Ocultar contraseña"
+                      : "Mostrar contraseña"
+                  }
+                >
+                  {showPassword ? (
+                    <EyeOff key="hide" size={22} />
+                  ) : (
+                    <Eye key="show" size={22} />
+                  )}
+                </button>
+              </div>
             </div>
 
             {/* Error */}
@@ -263,7 +286,7 @@ function Login() {
 
       {/* Footer */}
       <footer className="login-footer">
-        <span>GENSTI</span>
+        <span>GensTI</span>
 
         <span aria-hidden="true">
           •

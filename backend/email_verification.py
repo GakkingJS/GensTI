@@ -1,53 +1,87 @@
 from datetime import datetime, timedelta, timezone
 from hashlib import sha256
-from secrets import token_urlsafe
+from hmac import compare_digest
+from secrets import randbelow
 
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
-from models import EmailVerificationToken, User, EmailOutbox
+from models import EmailOutbox, EmailVerificationToken, User
 
 
-TOKEN_LIFETIME = timedelta(hours=1)
+CODE_LIFETIME = timedelta(minutes=10)
+MAX_ATTEMPTS = 5
 
 
-def _token_hash(token: str) -> str:
-    return sha256(token.encode("utf-8")).hexdigest()
+def _code_hash(user_id, code: str) -> str:
+    # Se mezcla el user_id: dos usuarios con el mismo código no chocan
+    # con la restricción unique de token_hash.
+    return sha256(f"{user_id}:{code}".encode("utf-8")).hexdigest()
 
 
 def create_verification_token(db: Session, user: User) -> str:
-    """Crea un token para entregar por correo; no hace commit."""
+    """Crea un código de 6 dígitos; invalida los anteriores. No hace commit."""
     if user.email_verified_at is not None or user.is_active:
         raise ValueError("La cuenta ya no está pendiente de verificación")
 
-    raw_token = token_urlsafe(32)
+    now = datetime.now(timezone.utc)
+
+    db.execute(
+        update(EmailVerificationToken)
+        .where(
+            EmailVerificationToken.user_id == user.id,
+            EmailVerificationToken.used_at.is_(None),
+        )
+        .values(used_at=now)
+    )
+
+    code = f"{randbelow(1_000_000):06d}"
+
     db.add(
         EmailVerificationToken(
             user_id=user.id,
-            token_hash=_token_hash(raw_token),
-            expires_at=datetime.now(timezone.utc) + TOKEN_LIFETIME,
+            token_hash=_code_hash(user.id, code),
+            expires_at=now + CODE_LIFETIME,
         )
     )
     db.flush()
-    return raw_token
+    return code
 
 
-def verify_email_token(db: Session, raw_token: str) -> bool:
-    """Verifica el correo y consume el token; no hace commit."""
-    if not raw_token or len(raw_token) > 256:
+def verify_email_code(db: Session, email: str, code: str) -> bool:
+    """Verifica el correo con el código. No hace commit.
+
+    Devuelve False en cualquier fallo; el llamador debe lanzar el error
+    FUERA del bloque de transacción para que el contador de intentos persista.
+    """
+    if not code or len(code) != 6 or not code.isdigit():
+        return False
+
+    user = db.scalar(
+        select(User).where(User.email == email).with_for_update()
+    )
+    if user is None or user.email_verified_at is not None or user.is_active:
         return False
 
     now = datetime.now(timezone.utc)
+
     record = db.scalar(
         select(EmailVerificationToken)
-        .where(EmailVerificationToken.token_hash == _token_hash(raw_token))
+        .where(
+            EmailVerificationToken.user_id == user.id,
+            EmailVerificationToken.used_at.is_(None),
+            EmailVerificationToken.expires_at > now,
+        )
+        .order_by(EmailVerificationToken.created_at.desc())
+        .limit(1)
         .with_for_update()
     )
-    if record is None or record.used_at is not None or record.expires_at <= now:
+    if record is None or record.attempts >= MAX_ATTEMPTS:
         return False
 
-    user = db.scalar(select(User).where(User.id == record.user_id).with_for_update())
-    if user is None or user.email_verified_at is not None or user.is_active:
+    if not compare_digest(record.token_hash, _code_hash(user.id, code)):
+        record.attempts += 1
+        db.flush()
         return False
 
     record.used_at = now
@@ -61,24 +95,26 @@ def queue_verification_email(
     db: Session,
     user: User,
     raw_token: str,
+    cipher,
 ) -> None:
     token_record = db.scalar(
-        select(EmailVerificationToken)
-        .where(
+        select(EmailVerificationToken).where(
             EmailVerificationToken.user_id == user.id,
-            EmailVerificationToken.token_hash == _token_hash(raw_token),
+            EmailVerificationToken.token_hash == _code_hash(user.id, raw_token),
         )
     )
 
     if token_record is None:
-        raise ValueError("No se encontró el token de verificación")
+        raise ValueError("No se encontró el código de verificación")
+
+    ciphertext = cipher.encrypt_token(raw_token)
 
     db.add(
         EmailOutbox(
             verification_token_id=token_record.id,
             recipient=user.email,
             message_type="email_verification",
-            token_ciphertext=raw_token,
+            token_ciphertext=ciphertext,
             status="pending",
             attempts=0,
         )

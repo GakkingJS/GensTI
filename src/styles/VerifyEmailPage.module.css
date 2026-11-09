@@ -1,0 +1,592 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap");
+
+/* ==========================================================================
+   VerifyEmailPage — GENSTI
+   Misma identidad que el panel admin y el chatbot: agua, verde y aguamarina.
+   La tarjeta tiene una marea que sube desde abajo, siempre en calma.
+   ========================================================================== */
+
+.page {
+  --bg: #eaf6f2;
+  --ink: #08333a;
+  --muted: #4a6f74;
+  --line: rgba(8, 51, 58, 0.12);
+  --teal: #0fa3a3;
+  --teal-deep: #0a6f7a;
+  --aqua: #2bd0b5;
+  --green: #34c77b;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.2, 1.15, 0.3, 1);
+
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+/* Cuadrícula que se desvanece hacia abajo */
+.page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: linear-gradient(to bottom, #000, transparent 70%);
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 70%);
+  opacity: 0.5;
+}
+
+/* Luces difusas que derivan despacio */
+.page::after {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 78% 18%, rgba(43, 208, 181, 0.45), transparent 34%),
+    radial-gradient(circle at 15% 85%, rgba(52, 199, 123, 0.32), transparent 36%);
+  filter: blur(40px);
+  animation: drift 24s ease-in-out infinite alternate;
+}
+
+.page > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   TARJETA
+   ========================================================================== */
+
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  padding: 2.75rem 2.35rem 2.25rem;
+  overflow: hidden;
+  border: 1.5px solid rgba(15, 163, 163, 0.22);
+  /* Esquina inferior izquierda cerrada: firma visual de GENSTI */
+  border-radius: 32px 32px 32px 10px;
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 40px 70px -34px rgba(8, 51, 58, 0.45),
+    0 6px 16px -8px rgba(8, 51, 58, 0.14);
+  text-align: left;
+  animation: rise 0.8s var(--ease-out) backwards;
+}
+
+/* La marea: dos capas de ola que giran muy lento al fondo */
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  left: -30%;
+  top: calc(100% - 64px);
+  width: 160%;
+  aspect-ratio: 1;
+  pointer-events: none;
+  border-radius: 43%;
+  background: rgba(15, 163, 163, 0.09);
+  animation: spin 18s linear infinite;
+}
+
+.card::after {
+  top: calc(100% - 52px);
+  border-radius: 40%;
+  background: rgba(52, 199, 123, 0.08);
+  animation-duration: 26s;
+  animation-direction: reverse;
+}
+
+.card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Secuencia de entrada, un solo movimiento orquestado */
+.badge,
+.card h1,
+.card p,
+.form,
+.loginLink {
+  animation: rise 0.7s var(--ease-out) backwards;
+}
+
+.badge { animation-delay: 0.15s; }
+.card h1 { animation-delay: 0.25s; }
+.card p { animation-delay: 0.35s; }
+.form { animation-delay: 0.45s; }
+.loginLink { animation-delay: 0.6s; }
+
+/* ---------- Insignia ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  padding: 0.4rem 0.95rem 0.4rem 0.75rem;
+  border: 1px solid rgba(15, 163, 163, 0.28);
+  border-radius: 999px;
+  background: rgba(15, 163, 163, 0.1);
+  color: var(--teal-deep);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+}
+
+.badgeDot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+}
+
+.badgeDot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--green);
+  animation: ping 2.2s ease-out infinite;
+}
+
+/* ---------- Texto ---------- */
+
+.card h1 {
+  margin: 0 0 0.8rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 5vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--ink);
+}
+
+.card p {
+  max-width: 38ch;
+  margin: 0 0 1.75rem;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* ==========================================================================
+   FORMULARIO
+   ========================================================================== */
+
+.form {
+  text-align: left;
+}
+
+.field {
+  display: block;
+  margin-bottom: 1.25rem;
+}
+
+.field span {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1rem;
+  border: 1.5px solid #cfe3e1;
+  border-radius: 14px 14px 14px 5px;
+  background-color: #f7fcfb;
+  /* La línea de agua que se dibuja al enfocar */
+  background-image: linear-gradient(90deg, var(--teal), var(--aqua), var(--green));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 3px;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.98rem;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    background-size 0.5s var(--ease-out),
+    box-shadow 0.3s ease;
+}
+
+.field input::placeholder {
+  color: #8aa7aa;
+}
+
+.field input:hover {
+  border-color: #a9cfcb;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: var(--teal);
+  background-color: #fff;
+  background-size: 100% 3px;
+  box-shadow: 0 0 0 4px rgba(15, 163, 163, 0.14);
+}
+
+/* Campo del código: grande, en cifras tabulares y centrado */
+.field .codeInput {
+  padding: 1rem 1rem 1rem calc(1rem + 0.5em);
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5em;
+  text-align: center;
+}
+
+.field .codeInput::placeholder {
+  color: #b8d3d0;
+  letter-spacing: 0.5em;
+}
+
+/* ---------- Botón principal: el agua sube al pasar el cursor ---------- */
+
+.verifyButton {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  width: 100%;
+  margin: 0.5rem 0 1.25rem;
+  padding: 0.95rem;
+  overflow: hidden;
+  border: none;
+  border-radius: 16px 16px 16px 6px;
+  background: linear-gradient(135deg, var(--teal), var(--green));
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 16px 26px -14px rgba(15, 163, 163, 0.9);
+  transition: transform 0.4s var(--spring), box-shadow 0.3s ease;
+}
+
+.verifyButton::before {
+  content: "";
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  top: -30%;
+  bottom: 0;
+  z-index: -1;
+  border-radius: 50% 50% 0 0 / 28% 28% 0 0;
+  background: linear-gradient(135deg, var(--teal-deep), var(--teal));
+  transform: translateY(105%);
+  transition: transform 0.65s var(--ease-out);
+}
+
+.verifyButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 30px -14px rgba(10, 111, 122, 0.9);
+}
+
+.verifyButton:hover:not(:disabled)::before {
+  transform: translateY(0);
+}
+
+.verifyButton:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+.verifyButton:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+}
+
+.verifyButton:disabled {
+  background: #cfe3e1;
+  color: #7d9a9d;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   MENSAJES
+   (con .card delante para ganar a `.card p` sin usar !important)
+   ========================================================================== */
+
+.card .success,
+.card .error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  max-width: none;
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px 12px 12px 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+  animation: pop 0.45s var(--spring) backwards;
+}
+
+.card .success::before,
+.card .error::before {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.card .success {
+  border: 1px solid rgba(52, 199, 123, 0.4);
+  background: rgba(52, 199, 123, 0.12);
+  color: #11623a;
+}
+
+.card .success::before {
+  content: "✓";
+  background: var(--green);
+}
+
+.card .error {
+  border: 1px solid rgba(214, 70, 45, 0.35);
+  background: rgba(214, 70, 45, 0.08);
+  color: #a3281a;
+  animation-name: shake;
+  animation-duration: 0.5s;
+}
+
+.card .error::before {
+  content: "!";
+  background: #d6462d;
+}
+
+/* ---------- Reenviar código ---------- */
+
+.resendButton {
+  position: relative;
+  display: inline-block;
+  margin: 0 0 1.5rem;
+  padding: 0.25rem 0;
+  border: none;
+  background: none;
+  color: var(--teal-deep);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.resendButton::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--teal), var(--green));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.resendButton:hover:not(:disabled)::after,
+.resendButton:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.resendButton:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.resendButton:disabled {
+  color: #7d9a9d;
+  cursor: not-allowed;
+}
+
+/* ---------- Pie ---------- */
+
+.card .loginLink {
+  max-width: none;
+  margin: 0;
+  padding-top: 1.25rem;
+  border-top: 1px dashed rgba(15, 163, 163, 0.35);
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.loginLink a {
+  position: relative;
+  color: var(--teal-deep);
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.loginLink a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--teal), var(--green));
+  transform: scaleX(0.35);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.loginLink a:hover {
+  color: var(--ink);
+}
+
+.loginLink a:hover::after {
+  transform: scaleX(1);
+}
+
+.loginLink a:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   KEYFRAMES
+   ========================================================================== */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(6px);
+  }
+}
+
+@keyframes shake {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  80%,
+  100% {
+    transform: scale(3);
+    opacity: 0;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(4%, 3%) scale(1.1);
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE Y ACCESIBILIDAD
+   ========================================================================== */
+
+@media (max-width: 480px) {
+  .page {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 2.15rem 1.5rem 1.75rem;
+  }
+
+  .field .codeInput {
+    font-size: 1.45rem;
+    letter-spacing: 0.4em;
+    padding-left: calc(1rem + 0.4em);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page::after,
+  .card,
+  .card::before,
+  .card::after,
+  .badge,
+  .badgeDot::after,
+  .card h1,
+  .card p,
+  .form,
+  .loginLink,
+  .card .success,
+  .card .error {
+    animation: none;
+  }
+
+  .field input,
+  .verifyButton,
+  .verifyButton::before,
+  .resendButton::after,
+  .loginLink a::after {
+    transition-duration: 0.01ms;
+  }
+}

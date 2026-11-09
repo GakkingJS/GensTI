@@ -291,7 +291,7 @@ function App() {
 
               <Route
                 path="/verificar-correo"
-                element={<VerifyEmailRoute />}
+                element={<VerifyEmailPage />}
               />
 
 

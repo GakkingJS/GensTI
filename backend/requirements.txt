@@ -10,3 +10,4 @@ httpx2
 pwdlib[argon2]
 email-validator
 httpx
+brevo-python

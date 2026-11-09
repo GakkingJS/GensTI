@@ -1,92 +1,187 @@
-import { useEffect, useState } from 'react';
+import { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
-function readTokenFromHash(hash) {
-  if (!hash) return null;
+import styles from "../styles/VerifyEmailPage.module.css";
 
-  const fragment = hash.startsWith('#') ? hash.slice(1) : hash;
-  const params = new URLSearchParams(fragment);
+function VerifyEmailPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  return params.get('token');
-}
-
-export default function VerifyEmailPage({ hash = '' }) {
-  const tokenFromHash = readTokenFromHash(hash);
-
-  const [token, setToken] = useState(tokenFromHash);
-  const [status, setStatus] = useState(
-    tokenFromHash ? 'ready' : 'missing',
+  const [email, setEmail] = useState(
+    location.state?.email ?? ""
   );
-  const [message, setMessage] = useState('');
+  const [code, setCode] = useState("");
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
-  useEffect(() => {
-    const currentToken = readTokenFromHash(hash);
-
-    setToken(currentToken);
-    setStatus(currentToken ? 'ready' : 'missing');
-    setMessage('');
-
-    if (currentToken) {
-      window.history.replaceState(
-        window.history.state,
-        '',
-        window.location.pathname + window.location.search,
-      );
-    }
-  }, [hash]);
-
-  async function handleVerify() {
-    if (!token || status !== 'ready') return;
-
-    setStatus('working');
+  async function handleSubmit(event) {
+    event.preventDefault();
+    setMessage("");
+    setError("");
+    setIsVerifying(true);
 
     try {
-      const response = await fetch('/auth/verify-email', {
-        method: 'POST',
+      const response = await fetch("/auth/verify-email", {
+        method: "POST",
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ token }),
+        body: JSON.stringify({ email, code }),
       });
 
-      if (response.ok) {
-        setMessage('Tu correo fue verificado y la cuenta está activa.');
-        setStatus('success');
-      } else if (response.status === 400) {
-        setMessage('El enlace es inválido, venció o ya fue utilizado.');
-        setStatus('error');
-      } else {
-        setMessage('No pudimos completar la verificación. Inténtalo más tarde.');
-        setStatus('error');
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail ?? "No pudimos verificar tu correo."
+        );
       }
-    } catch {
-      setMessage('No se pudo contactar con el servidor. Inténtalo más tarde.');
-      setStatus('error');
+
+      setMessage(
+        data.message ?? "Correo verificado correctamente."
+      );
+      setCode("");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1800);
+    } catch (verifyError) {
+      setError(verifyError.message);
     } finally {
-      setToken(null);
+      setIsVerifying(false);
+    }
+  }
+
+  async function handleResend() {
+    setMessage("");
+    setError("");
+    setIsResending(true);
+
+    try {
+      const response = await fetch(
+        "/auth/resend-verification",
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail ?? "No pudimos reenviar el código."
+        );
+      }
+
+      setMessage(
+        data.message ?? "Enviamos un nuevo código a tu correo."
+      );
+    } catch (resendError) {
+      setError(resendError.message);
+    } finally {
+      setIsResending(false);
     }
   }
 
   return (
-    <section>
-      <h1>Verificar correo</h1>
+    <main className={styles.page}>
+      <section className={styles.card}>
+        <span className={styles.badge}>
+          <span className={styles.badgeDot} />
+          Verificación de correo
+        </span>
 
-      {status === 'missing' && (
-        <p>El enlace no contiene un token de verificación.</p>
-      )}
+        <h1>Confirma tu cuenta</h1>
 
-      {status === 'ready' && (
-        <>
-          <p>Confirma para activar tu cuenta institucional.</p>
+        <p>
+          Ingresa el código de 6 dígitos que enviamos a tu
+          correo para activar tu cuenta GensTI.
+        </p>
 
-          <button type="button" onClick={handleVerify}>
-            Verificar correo
+        <form
+          onSubmit={handleSubmit}
+          className={styles.form}
+        >
+          <label className={styles.field}>
+            Correo institucional
+
+            <input
+              type="email"
+              value={email}
+              onChange={(event) =>
+                setEmail(event.target.value)
+              }
+              placeholder="nombre@campusucc.edu.co"
+              required
+              autoComplete="email"
+            />
+          </label>
+
+          <label className={styles.field}>
+            Código de verificación
+
+            <input
+              className={styles.codeInput}
+              value={code}
+              onChange={(event) =>
+                setCode(
+                  event.target.value
+                    .replace(/\D/g, "")
+                    .slice(0, 6)
+                )
+              }
+              placeholder="000000"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              required
+            />
+          </label>
+
+          <button
+            type="submit"
+            className={styles.verifyButton}
+            disabled={isVerifying || code.length !== 6}
+          >
+            {isVerifying
+              ? "Verificando..."
+              : "Verificar correo"}
           </button>
-        </>
-      )}
+        </form>
 
-      {status === 'working' && <p>Verificando…</p>}
+        {message && (
+          <p className={styles.success}>{message}</p>
+        )}
 
-      {message && <p role="status">{message}</p>}
-    </section>
+        {error && (
+          <p className={styles.error}>{error}</p>
+        )}
+
+        <button
+          type="button"
+          className={styles.resendButton}
+          onClick={handleResend}
+          disabled={isResending || !email}
+        >
+          {isResending
+            ? "Reenviando..."
+            : "Reenviar código"}
+        </button>
+
+        <p className={styles.loginLink}>
+          ¿Ya verificaste tu cuenta?{" "}
+          <Link to="/login">Inicia sesión</Link>
+        </p>
+      </section>
+    </main>
   );
 }
+
+export default VerifyEmailPage;

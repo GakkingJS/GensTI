@@ -74,7 +74,6 @@ class User(Base):
 )
 
 
-
 class EmailVerificationToken(Base):
     __tablename__ = "email_verification_tokens"
     __table_args__ = (
@@ -105,6 +104,11 @@ class EmailVerificationToken(Base):
     )
     used_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True),
+    )
+    attempts: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        server_default="0",
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

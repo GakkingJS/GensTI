@@ -1,12 +1,19 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
+
+/* ==========================================================================
+   Register — GENSTI
+   ========================================================================== */
 
 .register-page {
-  --register-ink: #19372f;
-  --register-muted: #64756f;
-  --register-green: #286a50;
-  --register-mint: #bde8d2;
-  --register-paper: #f5f5ef;
-  --register-line: rgba(255, 255, 255, 0.16);
+  --ink: #f4faf8;
+  --soft: rgba(216, 237, 232, 0.72);
+  --muted: rgba(184, 216, 210, 0.72);
+  --line: rgba(184, 216, 210, 0.3);
+  --teal: #00a6a6;
+  --aqua: #53c7c1;
+  --green: #72b947;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.2, 1.15, 0.3, 1);
 
   position: relative;
   isolation: isolate;
@@ -15,56 +22,61 @@
   min-height: 100dvh;
   flex-direction: column;
   overflow: hidden;
-  background:
-    radial-gradient(
-      ellipse at 12% 12%,
-      rgba(61, 112, 83, 0.36),
-      transparent 34rem
-    ),
-    linear-gradient(135deg, #15251f 0%, #1b3028 52%, #13221d 100%);
-  color: #f4f5ef;
-  font-family: "Manrope", sans-serif;
+  background: #073b4c;
+  color: var(--ink);
+  font-family: "DM Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-.register-page::before,
-.register-page::after {
+/* ==========================================================================
+   Fondo
+   ========================================================================== */
+
+.register-page .register-background {
   position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.register-page .register-background .floating-lines-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.register-page .register-overlay {
+  position: absolute;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
-  content: "";
+  background:
+    radial-gradient(circle at 78% 42%, rgba(0, 166, 166, 0.12), transparent 32%),
+    linear-gradient(
+      10deg,
+      rgba(7, 59, 76, 0.96) 0%,
+      rgba(7, 59, 76, 0.82) 10%,
+      rgba(46, 99, 116, 0.48) 20%
+    );
 }
 
-.register-page::before {
-  inset: 0;
-  opacity: 0.22;
-  background-image: radial-gradient(
-    rgba(255, 255, 255, 0.45) 0.65px,
-    transparent 0.65px
-  );
-  background-size: 6px 6px;
-  mask-image: linear-gradient(
-    90deg,
-    #000 0%,
-    transparent 68%
-  );
-}
-
-.register-page::after {
-  top: -230px;
-  right: -160px;
-  width: 610px;
-  height: 610px;
-  border: 1px solid rgba(189, 232, 210, 0.13);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 45px rgba(189, 232, 210, 0.025),
-    0 0 0 95px rgba(189, 232, 210, 0.02);
-}
-
-.register-header {
+.register-page .register-header,
+.register-page .register-content,
+.register-page .register-footer {
   position: relative;
+}
+
+/* ==========================================================================
+   Encabezado
+   ========================================================================== */
+
+.register-page .register-header {
   z-index: 1;
   display: flex;
   width: min(1320px, calc(100% - 64px));
@@ -72,15 +84,22 @@
   justify-content: space-between;
   margin: 0 auto;
   padding: 28px 0;
+  animation: reg-fade 0.9s ease-out backwards;
 }
 
-.register-brand {
+.register-page .register-brand {
   display: inline-flex;
   align-items: center;
   text-decoration: none;
+  border-radius: 6px;
 }
 
-.register-logo {
+.register-page .register-brand:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 4px;
+}
+
+.register-page .register-logo {
   display: block;
   width: 142px;
   max-width: 42vw;
@@ -88,15 +107,12 @@
   object-fit: contain;
 }
 
-.register-header-note {
-  color: rgba(244, 245, 239, 0.62);
-  font-family: "DM Mono", monospace;
-  font-size: 10px;
-  letter-spacing: 0.04em;
-  text-align: right;
-}
+/* ==========================================================================
+   Contenido
+   ========================================================================== */
 
-.register-content {
+.register-page .register-content {
+  z-index: 1;
   display: grid;
   width: min(1120px, calc(100% - 64px));
   flex: 1;
@@ -107,435 +123,699 @@
   padding: 34px 0 62px;
 }
 
-.register-introduction {
+.register-page .register-introduction {
   max-width: 590px;
   padding-bottom: 20px;
 }
 
-.register-eyebrow,
-.register-label {
-  font-family: "DM Mono", monospace;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
+/* Entrada escalonada */
+.register-page .register-eyebrow,
+.register-page .register-introduction h1,
+.register-page .register-description,
+.register-page .register-highlight {
+  animation: reg-rise 0.8s var(--ease-out) backwards;
 }
 
-.register-eyebrow {
+.register-page .register-eyebrow { animation-delay: 0.1s; }
+.register-page .register-introduction h1 { animation-delay: 0.2s; }
+.register-page .register-description { animation-delay: 0.35s; }
+.register-page .register-highlight { animation-delay: 0.5s; }
+
+.register-page .register-eyebrow {
   display: flex;
   align-items: center;
   gap: 12px;
   margin: 0 0 26px;
-  color: var(--register-mint);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
 }
 
-.register-eyebrow::before {
-  width: 24px;
-  height: 1px;
-  background: var(--register-mint);
+/* Punto vivo antes del texto */
+.register-page .register-eyebrow::before {
   content: "";
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: reg-ping 2.4s ease-out infinite;
 }
 
-.register-introduction h1 {
+.register-page .register-introduction h1 {
   margin: 0;
+  color: var(--ink);
+  font-family: "Space Grotesk", sans-serif;
   font-size: clamp(50px, 6.4vw, 86px);
-  font-weight: 600;
-  letter-spacing: -0.075em;
-  line-height: 0.99;
+  font-weight: 520;
+  letter-spacing: -0.05em;
+  line-height: 0.98;
 }
 
-.register-introduction h1 span {
-  color: var(--register-mint);
+/* "Tu espacio." se rellena con un agua que se mueve despacio */
+.register-page .register-introduction h1 span {
+  color: var(--aqua);
+  background: linear-gradient(
+    100deg,
+    #53c7c1 0%,
+    #72b947 35%,
+    #00a6a6 65%,
+    #53c7c1 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: reg-flow 10s linear infinite;
 }
 
-.register-description {
+.register-page .register-description {
   max-width: 440px;
   margin: 28px 0 0;
-  color: rgba(244, 245, 239, 0.72);
-  font-size: 15px;
-  line-height: 1.85;
-}
-
-.register-note {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-top: 44px;
-  padding-top: 18px;
-  border-top: 1px solid var(--register-line);
-}
-
-.register-note-mark {
-  color: var(--register-mint);
-  font-family: "DM Mono", monospace;
-  font-size: 11px;
-}
-
-.register-note p {
-  margin: 0;
-  color: rgba(244, 245, 239, 0.68);
-  font-size: 12px;
-  line-height: 1.7;
-}
-
-.register-note strong {
-  color: #e8f4eb;
-  font-weight: 600;
-}
-
-.register-panel {
-  width: 100%;
-  box-sizing: border-box;
-  padding: clamp(28px, 4vw, 42px);
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 8px;
-  background: var(--register-paper);
-  color: var(--register-ink);
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.24);
-}
-
-.register-panel-heading {
-  margin-bottom: 30px;
-}
-
-.register-label {
-  margin: 0 0 15px;
-  color: var(--register-green);
-}
-
-.register-panel-heading h2 {
-  margin: 0;
-  font-size: clamp(27px, 3vw, 34px);
-  font-weight: 600;
-  letter-spacing: -0.06em;
-  line-height: 1.15;
-}
-
-.register-panel-heading > p:last-child {
-  max-width: 330px;
-  margin: 12px 0 0;
-  color: var(--register-muted);
-  font-size: 12px;
+  color: var(--soft);
+  font-size: 16px;
   line-height: 1.75;
 }
 
-.register-form {
+/* Frase de cierre con punto vivo (el JSX usa .register-highlight) */
+.register-page .register-highlight {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 40px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(184, 216, 210, 0.2);
+  color: rgba(244, 250, 248, 0.78);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.register-page .register-highlight-dot {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--aqua);
+  animation: reg-ping-aqua 2.6s ease-out infinite;
+}
+
+/* ==========================================================================
+   Panel
+   ========================================================================== */
+
+.register-page .register-panel {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  padding: clamp(28px, 4vw, 42px);
+  border: 1px solid rgba(184, 216, 210, 0.24);
+  /* Esquina inferior izquierda cerrada: firma visual de GENSTI */
+  border-radius: 28px 28px 28px 8px;
+  background: rgba(4, 42, 54, 0.82);
+  color: var(--ink);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  animation: reg-rise 0.9s var(--ease-out) 0.3s backwards;
+}
+
+/* Hilo de luz que recorre el borde superior */
+.register-page .register-panel::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 32px;
+  right: 32px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--teal), var(--green), transparent);
+  background-size: 200% 100%;
+  animation: reg-flow 8s linear infinite;
+  opacity: 0.9;
+}
+
+.register-page .register-panel-heading {
+  margin-bottom: 30px;
+}
+
+.register-page .register-label {
+  margin: 0 0 12px;
+  color: var(--aqua);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.register-page .register-panel-heading h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: "Space Grotesk", sans-serif;
+  font-size: clamp(30px, 3vw, 38px);
+  font-weight: 520;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.register-page .register-panel-heading > p:last-child {
+  max-width: 340px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   Formulario
+   ========================================================================== */
+
+.register-page .register-form {
   display: flex;
   flex-direction: column;
   gap: 22px;
 }
 
-.register-field {
+.register-page .register-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.register-field label {
-  color: #263a32;
+.register-page .register-field label {
+  color: rgba(244, 250, 248, 0.82);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
-.register-field input {
+.register-page .register-field input {
   box-sizing: border-box;
   width: 100%;
   min-width: 0;
   min-height: 50px;
-  padding: 13px 14px;
-  border: 1px solid #d6ddd7;
-  border-radius: 4px;
+  padding: 13px 0;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
   outline: none;
-  background: #fff;
-  color: #1d3028;
+  background-color: transparent;
+  /* Línea de agua que se dibuja de izquierda a derecha al enfocar */
+  background-image: linear-gradient(90deg, var(--teal), var(--aqua), var(--green));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 2px;
+  color: var(--ink);
   font: inherit;
-  font-size: 13px;
+  font-size: 15px;
   transition:
-    border-color 160ms ease,
-    box-shadow 160ms ease,
-    background-color 160ms ease;
+    border-color 0.2s ease,
+    background-size 0.55s var(--ease-out);
 }
 
-.register-field input::placeholder {
-  color: #98a39c;
+.register-page .register-field input::placeholder {
+  color: rgba(184, 216, 210, 0.48);
 }
 
-.register-field input:hover {
-  border-color: #9baea2;
+.register-page .register-field input:hover {
+  border-bottom-color: rgba(184, 216, 210, 0.55);
 }
 
-.register-field input:focus-visible {
-  border-color: var(--register-green);
-  box-shadow: 0 0 0 3px rgba(40, 106, 80, 0.14);
+.register-page .register-field input:focus {
+  border-bottom-color: transparent;
+  background-size: 100% 2px;
 }
 
-.register-hint {
-  color: #748079;
-  font-size: 10px;
+/* Autocompletado del navegador: sin el fondo claro que rompe el tema oscuro */
+.register-page .register-field input:-webkit-autofill {
+  -webkit-text-fill-color: var(--ink);
+  caret-color: var(--ink);
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* ---------- Mostrar / ocultar contraseñas ---------- */
+
+/* Oculta el ojito nativo de Edge: no se puede agrandar, así que usamos el nuestro */
+.register-page .register-field input[type="password"]::-ms-reveal,
+.register-page .register-field input[type="password"]::-ms-clear {
+  display: none;
+}
+
+.register-page .register-password-wrap {
+  position: relative;
+}
+
+.register-page .register-field .register-password-wrap input {
+  padding-right: 56px;
+}
+
+.register-page .register-password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  display: grid;
+  place-items: center;
+  /* Zona táctil de 44px: cómoda en celular */
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  border-radius: 12px 12px 12px 4px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.35s var(--spring);
+}
+
+.register-page .register-password-toggle:hover {
+  color: var(--aqua);
+  background-color: rgba(0, 166, 166, 0.16);
+}
+
+.register-page .register-password-toggle:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+.register-page .register-password-toggle:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
+
+/* Contraseñas visibles: el ojo queda resaltado */
+.register-page .register-password-toggle[aria-pressed="true"] {
+  color: var(--aqua);
+  background-color: rgba(0, 166, 166, 0.2);
+}
+
+.register-page .register-password-toggle svg {
+  animation: reg-eye-swap 0.35s var(--spring);
+}
+
+/* Confirmación que ya se desvió de la contraseña: la línea pasa a rojo suave */
+.register-page .register-field input[aria-invalid="true"] {
+  border-bottom-color: #d95d59;
+  background-image: linear-gradient(90deg, #d95d59, #ff9f98);
+}
+
+.register-page .register-hint {
+  color: rgba(184, 216, 210, 0.62);
+  font-size: 11px;
   line-height: 1.6;
 }
 
-.register-message {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px;
-  border: 1px solid;
-  border-radius: 4px;
-  font-size: 11px;
-  line-height: 1.65;
+/* ---------- Texto de ayuda de la confirmación ---------- */
+
+.register-page .register-field .register-confirm-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: color 0.25s ease;
+}
+
+.register-page .register-confirm-hint svg {
+  flex-shrink: 0;
+  box-sizing: content-box;
+  padding: 2px;
+  border-radius: 50%;
+  color: #04303a;
+  animation: reg-pop 0.4s var(--spring);
+}
+
+.register-page .register-confirm-hint[data-state="match"] {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.register-page .register-confirm-hint[data-state="match"] svg {
+  background: var(--green);
+}
+
+.register-page .register-confirm-hint[data-state="mismatch"] {
+  color: #ff9f98;
+  font-weight: 600;
+}
+
+.register-page .register-confirm-hint[data-state="mismatch"] svg {
+  background: #ff9f98;
+}
+
+/* ---------- Mensajes ---------- */
+
+.register-page .register-message {
+  padding: 12px 14px;
+  border-left: 2px solid;
+  border-radius: 4px 10px 10px 4px;
+  font-size: 13px;
+  line-height: 1.55;
   overflow-wrap: anywhere;
 }
 
-.register-message p {
-  margin: 0;
+.register-page .register-error {
+  border-color: #d95d59;
+  background: rgba(217, 93, 89, 0.12);
+  color: #ffd7d5;
+  animation: reg-shake 0.5s ease-out;
 }
 
-.register-message-mark {
-  display: inline-grid;
-  width: 17px;
-  height: 17px;
-  flex: 0 0 17px;
-  place-items: center;
-  border-radius: 50%;
-  font-size: 11px;
-  font-weight: 800;
+.register-page .register-success {
+  border-color: var(--green);
+  background: rgba(114, 185, 71, 0.13);
+  color: #dff3cc;
+  animation: reg-pop 0.45s var(--spring);
 }
 
-.register-error {
-  border-color: #e6b9b4;
-  background: #fff1ef;
-  color: #8f2e27;
-}
+/* ---------- Botón principal: el agua sube al pasar el cursor ---------- */
 
-.register-error .register-message-mark {
-  background: #f4d9d5;
-}
-
-.register-success {
-  border-color: #b5d6bf;
-  background: #edf7ef;
-  color: #285f3e;
-}
-
-.register-success .register-message-mark {
-  background: #d6eadb;
-}
-
-.register-button {
+.register-page .register-button {
+  position: relative;
+  isolation: isolate;
   display: flex;
   width: 100%;
-  min-height: 51px;
+  min-height: 52px;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  padding: 13px 16px;
-  border: 1px solid var(--register-green);
-  border-radius: 4px;
-  background: var(--register-green);
-  color: #fff;
-  font: inherit;
-  font-size: 12px;
+  margin-top: 6px;
+  padding: 14px 18px;
+  overflow: hidden;
+  border: 1px solid #36c6c6;
+  border-radius: 14px 14px 14px 5px;
+  background: #36c6c6;
+  /* Texto oscuro: con blanco sobre este aguamarina el contraste era bajo */
+  color: #04303a;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   transition:
-    background-color 160ms ease,
-    border-color 160ms ease;
+    transform 0.4s var(--spring),
+    box-shadow 0.3s ease;
 }
 
-.register-button:hover:not(:disabled) {
-  border-color: #1e563e;
-  background: #1e563e;
+.register-page .register-button::before {
+  content: "";
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  top: -30%;
+  bottom: 0;
+  z-index: -1;
+  border-radius: 50% 50% 0 0 / 28% 28% 0 0;
+  background: linear-gradient(135deg, var(--aqua), var(--green));
+  transform: translateY(105%);
+  transition: transform 0.65s var(--ease-out);
 }
 
-.register-button:focus-visible {
-  outline: 3px solid #78aa8d;
+.register-page .register-button:hover:not(:disabled) {
+  box-shadow: 0 14px 30px rgba(0, 166, 166, 0.3);
+  transform: translateY(-2px);
+}
+
+.register-page .register-button:hover:not(:disabled)::before {
+  transform: translateY(0);
+}
+
+.register-page .register-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+.register-page .register-button:focus-visible {
+  outline: 3px solid var(--green);
   outline-offset: 3px;
 }
 
-.register-button:disabled {
+.register-page .register-button:disabled {
   opacity: 0.62;
   cursor: wait;
 }
 
-.register-arrow {
-  font-size: 19px;
+.register-page .register-arrow {
+  font-size: 20px;
   line-height: 1;
-  transition: transform 160ms ease;
+  transition: transform 0.3s var(--ease-out);
 }
 
-.register-button:hover:not(:disabled) .register-arrow {
-  transform: translateX(3px);
+.register-page .register-button:hover:not(:disabled) .register-arrow {
+  transform: translateX(5px);
 }
 
-.register-login-prompt {
+/* ---------- Ya tengo cuenta ---------- */
+
+.register-page .register-login-prompt {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 5px;
-  margin: 24px 0 0;
-  color: #78847d;
-  font-size: 11px;
+  gap: 6px;
+  margin: 26px 0 0;
+  color: rgba(184, 216, 210, 0.58);
+  font-size: 12px;
   line-height: 1.7;
 }
 
-.register-login-prompt a {
-  color: var(--register-green);
-  font-weight: 800;
+.register-page .register-login-prompt a {
+  position: relative;
+  color: var(--green);
+  font-weight: 600;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.register-login-prompt a:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+.register-page .register-login-prompt a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0.35);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease-out);
 }
 
-.register-footer {
+.register-page .register-login-prompt a:hover {
+  color: #9bdb70;
+}
+
+.register-page .register-login-prompt a:hover::after {
+  transform: scaleX(1);
+}
+
+.register-page .register-login-prompt a:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.register-page .register-footer {
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 10px;
   padding: 20px 24px 24px;
-  color: rgba(244, 245, 239, 0.5);
-  font-family: "DM Mono", monospace;
-  font-size: 9px;
+  color: rgba(190, 199, 197, 0.5);
+  font-size: 11px;
   letter-spacing: 0.04em;
   text-align: center;
+  animation: reg-fade 1s ease-out 0.8s backwards;
 }
 
-.register-footer span:first-child {
-  color: var(--register-mint);
-  font-weight: 500;
-  letter-spacing: 0.12em;
+.register-page .register-footer span:first-child {
+  color: rgba(244, 250, 248, 0.82);
+  font-weight: 700;
 }
+
+/* ==========================================================================
+   Keyframes (con prefijo para no chocar con los de otras páginas)
+   ========================================================================== */
+
+@keyframes reg-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@keyframes reg-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes reg-flow {
+  to {
+    background-position: -220% 0;
+  }
+}
+
+@keyframes reg-ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba(114, 185, 71, 0.7);
+  }
+  80%,
+  100% {
+    box-shadow: 0 0 0 9px rgba(114, 185, 71, 0);
+  }
+}
+
+@keyframes reg-ping-aqua {
+  0% {
+    box-shadow: 0 0 0 0 rgba(83, 199, 193, 0.7);
+  }
+  80%,
+  100% {
+    box-shadow: 0 0 0 9px rgba(83, 199, 193, 0);
+  }
+}
+
+@keyframes reg-eye-swap {
+  from {
+    opacity: 0;
+    transform: rotate(-25deg) scale(0.6);
+  }
+}
+
+@keyframes reg-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+@keyframes reg-shake {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
 
 @media (max-width: 800px) {
-  .register-header {
+  .register-page .register-header {
     width: calc(100% - 40px);
     padding: 21px 0;
   }
 
-  .register-logo {
+  .register-page .register-logo {
     width: 124px;
   }
 
-  .register-header-note {
-    max-width: 150px;
-    font-size: 9px;
-    line-height: 1.6;
-  }
-
-  .register-content {
+  .register-page .register-content {
     width: min(480px, calc(100% - 40px));
     grid-template-columns: minmax(0, 1fr);
     gap: 30px;
     padding: 35px 0 42px;
   }
 
-  .register-introduction {
+  .register-page .register-introduction {
     padding: 0;
     text-align: center;
   }
 
-  .register-eyebrow {
+  .register-page .register-eyebrow {
     justify-content: center;
     margin-bottom: 18px;
   }
 
-  .register-introduction h1 {
+  .register-page .register-introduction h1 {
     font-size: clamp(44px, 10vw, 62px);
   }
 
-  .register-description {
+  .register-page .register-description {
     max-width: 390px;
     margin: 18px auto 0;
-    font-size: 13px;
+    font-size: 14px;
   }
 
-  .register-note {
+  .register-page .register-highlight {
     justify-content: center;
     margin: 22px auto 0;
     padding-top: 13px;
+    text-align: left;
   }
 
-  .register-panel {
+  .register-page .register-panel {
     padding: 29px 25px;
   }
 }
 
 @media (max-width: 420px) {
-  .register-header {
+  .register-page .register-header {
     width: calc(100% - 32px);
   }
 
-  .register-content {
+  .register-page .register-content {
     width: calc(100% - 32px);
     gap: 25px;
     padding-top: 24px;
   }
 
-  .register-introduction h1 {
+  .register-page .register-introduction h1 {
     font-size: 43px;
   }
 
-  .register-panel {
+  .register-page .register-panel {
     padding: 25px 20px;
   }
 
-  .register-panel-heading {
+  .register-page .register-panel-heading {
     margin-bottom: 25px;
   }
 
-  .register-form {
+  .register-page .register-form {
     gap: 19px;
   }
 }
 
+/* ==========================================================================
+   Movimiento reducido
+   ========================================================================== */
+
 @media (prefers-reduced-motion: reduce) {
-  .register-field input,
-  .register-button,
-  .register-arrow {
-    scroll-behavior: auto;
-    transition: none;
+  .register-page *,
+  .register-page *::before,
+  .register-page *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
   }
-}
 
+  .register-page .register-background {
+    opacity: 0.28;
+  }
 
-
-/* Fondo animado: ocupa toda la página sin crear otra sección */
-.register-background {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.register-background .floating-lines-container {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-
-.register-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    rgba(15, 31, 24, 0.48),
-    rgba(15, 31, 24, 0.18)
-  );
-}
-
-
-.register-header,
-.register-content,
-.register-footer {
-  position: relative;
+  /* Sin animación, el texto con degradado sigue siendo legible */
+  .register-page .register-introduction h1 span {
+    -webkit-text-fill-color: initial;
+    background: none;
+    color: var(--aqua);
+  }
 }

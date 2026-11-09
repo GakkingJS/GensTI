@@ -39,6 +39,7 @@ def register_user(
         raise InvalidRegistrationEmail("Correo institucional inválido")
 
     normalized_email = email.strip().lower()
+
     if (
         len(normalized_email) > 254
         or not INSTITUTIONAL_EMAIL.fullmatch(normalized_email)
@@ -49,16 +50,19 @@ def register_user(
         raise EmailAlreadyRegistered("El correo ya está registrado")
 
     password_digest = hash_password(password)
+
     user = User(
         email=normalized_email,
         password_hash=password_digest,
         email_verified_at=None,
         is_active=False,
     )
+
     db.add(user)
     db.flush()
 
     token = create_verification_token(db, user)
+
     return PendingRegistration(
         user_id=user.id,
         verification_token=token,

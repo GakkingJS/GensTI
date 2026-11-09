@@ -1,5 +1,6 @@
-import { lazy, memo, Suspense, useState } from "react";
-import { Link } from "react-router-dom";
+import { lazy, memo, Suspense, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Check, Eye, EyeOff, X } from "lucide-react";
 
 import "./Register.css";
 import logoGensti from "../assets/logo-gensti.png";
@@ -15,12 +16,61 @@ const TOP_WAVE_POSITION = { x: 10, y: 0.5, rotate: -0.4 };
 const MIDDLE_WAVE_POSITION = { x: 5, y: 0, rotate: 0.2 };
 const BOTTOM_WAVE_POSITION = { x: 2, y: -0.7, rotate: 0.4 };
 
+const CONFIRM_HINTS = {
+  idle: "Vuelve a escribir tu contraseña para confirmarla.",
+  match: "Las contraseñas coinciden.",
+  mismatch: "Las contraseñas no coinciden.",
+};
+
+// Botón del ojito: un solo estado controla los dos campos de contraseña
+function PasswordToggle({ visible, onToggle }) {
+  const label = visible ? "Ocultar contraseñas" : "Mostrar contraseñas";
+
+  return (
+    <button
+      type="button"
+      className="register-password-toggle"
+      onClick={onToggle}
+      // Evita que el botón le quite el foco al campo al hacer clic
+      onMouseDown={(event) => event.preventDefault()}
+      aria-label={label}
+      aria-pressed={visible}
+      title={label}
+    >
+      {visible ? (
+        <EyeOff key="hide" size={22} />
+      ) : (
+        <Eye key="show" size={22} />
+      )}
+    </button>
+  );
+}
+
 export default function RegisterPage() {
+  const navigate = useNavigate();
+  const confirmRef = useRef(null);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  /*
+   * Estado de la confirmación, pensado para no regañar a medio escribir:
+   * - idle: aún no escribe, o lo que lleva coincide con el inicio de la contraseña
+   * - match: ya son iguales
+   * - mismatch: lo escrito ya se desvió de la contraseña
+   */
+  const confirmStatus = !confirmPassword
+    ? "idle"
+    : confirmPassword === password
+      ? "match"
+      : password.startsWith(confirmPassword)
+        ? "idle"
+        : "mismatch";
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -34,9 +84,16 @@ export default function RegisterPage() {
       return;
     }
 
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden. Escríbelas de nuevo.");
+      confirmRef.current?.focus();
+      return;
+    }
+
     setLoading(true);
 
     try {
+      // La confirmación solo se valida aquí: el backend no la necesita
       const response = await fetch("/auth/register", {
         method: "POST",
         headers: {
@@ -57,12 +114,9 @@ export default function RegisterPage() {
         );
       }
 
-      setSuccess(
-        data.message ||
-          "Cuenta creada. Revisa tu correo institucional para verificarla."
-      );
-      setEmail(normalizedEmail);
-      setPassword("");
+      navigate("/verificar-correo", {
+        state: { email: normalizedEmail },
+      });
     } catch (requestError) {
       setError(
         requestError.message ||
@@ -100,11 +154,11 @@ export default function RegisterPage() {
         <Link
           to="/"
           className="register-brand"
-          aria-label="GENSTI, ir al inicio"
+          aria-label="GensTI, ir al inicio"
         >
           <img
             src={logoGensti}
-            alt="GENSTI"
+            alt="GensTI"
             className="register-logo"
           />
         </Link>
@@ -144,7 +198,7 @@ export default function RegisterPage() {
           aria-labelledby="register-title"
         >
           <div className="register-panel-heading">
-            <p className="register-label">ÚNETE A GENSTI</p>
+            <p className="register-label">ÚNETE A GensTI</p>
 
             <h2 id="register-title">Crea tu cuenta.</h2>
 
@@ -192,29 +246,87 @@ export default function RegisterPage() {
                 Crea una contraseña
               </label>
 
-              <input
-                id="register-password"
-                name="password"
-                type="password"
-                value={password}
-                onChange={(event) => {
-                  setPassword(event.target.value);
-                  setError("");
-                  setSuccess("");
-                }}
-                placeholder="Mínimo 12 caracteres"
-                autoComplete="new-password"
-                minLength={12}
-                maxLength={1024}
-                aria-describedby="register-password-hint"
-                required
-              />
+              <div className="register-password-wrap">
+                <input
+                  id="register-password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(event) => {
+                    setPassword(event.target.value);
+                    setError("");
+                    setSuccess("");
+                  }}
+                  placeholder="Mínimo 12 caracteres"
+                  autoComplete="new-password"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  minLength={12}
+                  maxLength={1024}
+                  aria-describedby="register-password-hint"
+                  required
+                />
+
+                <PasswordToggle
+                  visible={showPassword}
+                  onToggle={() => setShowPassword((value) => !value)}
+                />
+              </div>
 
               <span
                 className="register-hint"
                 id="register-password-hint"
               >
                 Utiliza al menos 12 caracteres.
+              </span>
+            </div>
+
+            <div className="register-field">
+              <label htmlFor="register-confirm-password">
+                Confirma tu contraseña
+              </label>
+
+              <div className="register-password-wrap">
+                <input
+                  id="register-confirm-password"
+                  ref={confirmRef}
+                  name="confirmPassword"
+                  type={showPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(event) => {
+                    setConfirmPassword(event.target.value);
+                    setError("");
+                    setSuccess("");
+                  }}
+                  placeholder="Escríbela otra vez"
+                  autoComplete="new-password"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  maxLength={1024}
+                  aria-describedby="register-confirm-hint"
+                  aria-invalid={confirmStatus === "mismatch"}
+                  required
+                />
+
+                <PasswordToggle
+                  visible={showPassword}
+                  onToggle={() => setShowPassword((value) => !value)}
+                />
+              </div>
+
+              <span
+                className="register-hint register-confirm-hint"
+                id="register-confirm-hint"
+                data-state={confirmStatus}
+                role="status"
+              >
+                {confirmStatus === "match" && (
+                  <Check size={14} strokeWidth={3} aria-hidden="true" />
+                )}
+                {confirmStatus === "mismatch" && (
+                  <X size={14} strokeWidth={3} aria-hidden="true" />
+                )}
+                {CONFIRM_HINTS[confirmStatus]}
               </span>
             </div>
 
@@ -243,7 +355,9 @@ export default function RegisterPage() {
               disabled={loading}
             >
               <span>
-                {loading ? "Creando cuenta..." : "Crear mi cuenta"}
+                {loading
+                  ? "Creando cuenta..."
+                  : "Crear mi cuenta"}
               </span>
 
               {!loading && (
@@ -265,7 +379,7 @@ export default function RegisterPage() {
       </section>
 
       <footer className="register-footer">
-        <span>GENSTI</span>
+        <span>GensTI</span>
         <span aria-hidden="true">·</span>
         <span>Universidad Cooperativa de Colombia</span>
       </footer>
