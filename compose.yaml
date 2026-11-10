@@ -14,13 +14,10 @@ services:
       timeout: 3s
       retries: 10
 
-
   api:
     build:
       context: ./backend
     restart: unless-stopped
-    ports:
-      - "127.0.0.1:8000:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -28,14 +25,13 @@ services:
       DB_PASSWORD_FILE: /run/secrets/gensti_app_password
       OUTBOX_FERNET_KEY_FILE: /run/secrets/outbox_fernet_key
 
-      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      OLLAMA_BASE_URL: http://172.17.0.1:11434
       OLLAMA_MODEL: qwen3:1.7b
 
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      FRONTEND_URL: ${FRONTEND_URL:-http://IP_PUBLICA}
     secrets:
       - gensti_app_password
       - outbox_fernet_key
-
 
   worker:
     build:
@@ -57,6 +53,21 @@ services:
       - gensti_app_password
       - outbox_fernet_key
 
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - api
+      - frontend
 
   migrate:
     build:
@@ -75,7 +86,6 @@ services:
     secrets:
       - gensti_migration_password
 
-
 secrets:
   gensti_app_password:
     file: ./secrets/gensti_app_password.txt
@@ -83,7 +93,6 @@ secrets:
     file: ./secrets/gensti_migration_password.txt
   outbox_fernet_key:
     file: ./secrets/outbox_fernet_key
-
 
 volumes:
   postgres_data:
