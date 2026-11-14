@@ -41,6 +41,7 @@ from pqrs_routes import router as pqrs_router
 from event_routes import router as event_router
 from community_posts_routes import router as community_posts_router
 from faq_routes import router as faq_router
+from users_routes import router as users_router
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,7 @@ app.include_router(pqrs_router)
 app.include_router(event_router)
 app.include_router(community_posts_router)
 app.include_router(faq_router)
+app.include_router(users_router)
 
 frontend_origins = [
     origin.strip()

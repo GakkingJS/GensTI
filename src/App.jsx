@@ -52,6 +52,7 @@ const BOTGPage = lazy(() => import("./pages/BOTGPage"));
 
 
 const AdminPage = lazy(() => import("./pages/AdminPage"));
+const AdminUsuariosPage = lazy(() => import("./pages/AdminUsuariosPage"));
 const NewsFormPage = lazy(() => import("./pages/NewsFormPage"));
 
 
@@ -100,6 +101,15 @@ function MainLayout() {
             element={
               <ProtectedRoute permission="users.manage">
                 <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/usuarios"
+            element={
+              <ProtectedRoute permission="users.manage">
+                <AdminUsuariosPage />
               </ProtectedRoute>
             }
           />

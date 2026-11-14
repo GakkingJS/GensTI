@@ -9,7 +9,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test:
+        - CMD-SHELL
+        - pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
       interval: 5s
       timeout: 3s
       retries: 10
@@ -18,6 +20,8 @@ services:
     build:
       context: ./backend
     restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
     depends_on:
       db:
         condition: service_healthy
@@ -25,10 +29,10 @@ services:
       DB_PASSWORD_FILE: /run/secrets/gensti_app_password
       OUTBOX_FERNET_KEY_FILE: /run/secrets/outbox_fernet_key
 
-      OLLAMA_BASE_URL: http://172.17.0.1:11434
-      OLLAMA_MODEL: qwen3:1.7b
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://172.17.0.1:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:1.7b}
 
-      FRONTEND_URL: ${FRONTEND_URL:-http://IP_PUBLICA}
+      FRONTEND_URL: ${FRONTEND_URL:?Falta FRONTEND_URL en .env}
     secrets:
       - gensti_app_password
       - outbox_fernet_key
@@ -55,7 +59,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
 
   nginx:
@@ -89,8 +94,10 @@ services:
 secrets:
   gensti_app_password:
     file: ./secrets/gensti_app_password.txt
+
   gensti_migration_password:
     file: ./secrets/gensti_migration_password.txt
+
   outbox_fernet_key:
     file: ./secrets/outbox_fernet_key
 
