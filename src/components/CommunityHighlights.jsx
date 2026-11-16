@@ -1,55 +1,190 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
-import { m, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import {
+  m,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 
-import { communityHighlights as staticHighlights } from "../data/community";
 import ScrollReveal from "./ScrollReveal";
+import styles from "../styles/CommunityHighlights.module.css";
 
-function CommunityHighlights() {
-  const [highlights, setHighlights] = useState(staticHighlights);
-  const [loading, setLoading] = useState(true);
+/* ==========================================
+   FOTOGRAFÍA PRINCIPAL
+========================================== */
 
-  const [mainHighlight, ...secondaryHighlights] = highlights;
-
+function FeaturedPhoto({ highlight }) {
   const featuredRef = useRef(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
     target: featuredRef,
     offset: ["start end", "end start"],
   });
 
-  const featuredImageY = useTransform(
+  const imageY = useTransform(
     scrollYProgress,
     [0, 1],
-    ["-8%", "8%"]
+    ["-6%", "6%"]
   );
 
+  return (
+    <ScrollReveal
+      className={styles.featuredReveal}
+      delay={0.08}
+    >
+      <div
+        ref={featuredRef}
+        className={styles.featuredScrollTarget}
+      >
+        <Link
+          to="/botg"
+          className={styles.featuredCard}
+          aria-label={`${highlight.title}. Explorar TBOG`}
+        >
+          <div className={styles.featuredImageWindow}>
+            <m.img
+              src={highlight.image}
+              alt={highlight.image_alt || ""}
+              className={styles.featuredImage}
+              loading="lazy"
+              decoding="async"
+              style={{
+                y: prefersReducedMotion ? 0 : imageY,
+                objectPosition:
+                  highlight.image_position || "center",
+              }}
+            />
+          </div>
+
+          <span
+            className={styles.imageShade}
+            aria-hidden="true"
+          />
+
+          <div className={styles.featuredContent}>
+            <h3 className={styles.featuredTitle}>
+              {highlight.title}
+            </h3>
+
+            <span
+              className={styles.cardArrow}
+              aria-hidden="true"
+            >
+              <ArrowUpRight size={23} strokeWidth={1.7} />
+            </span>
+          </div>
+        </Link>
+      </div>
+    </ScrollReveal>
+  );
+}
+
+/* ==========================================
+   FOTOGRAFÍAS SECUNDARIAS
+========================================== */
+
+function SecondaryPhoto({ highlight, index }) {
+  return (
+    <ScrollReveal
+      className={styles.secondaryReveal}
+      delay={0.14 + Math.min(index, 4) * 0.08}
+    >
+      <Link
+        to="/botg"
+        className={styles.secondaryCard}
+        aria-label={`${highlight.title}. Explorar TBOG`}
+      >
+        <div className={styles.secondaryImageWindow}>
+          <img
+            src={highlight.image}
+            alt={highlight.image_alt || ""}
+            className={styles.secondaryImage}
+            loading="lazy"
+            decoding="async"
+            style={{
+              objectPosition:
+                highlight.image_position || "center",
+            }}
+          />
+        </div>
+
+        <span
+          className={styles.imageShade}
+          aria-hidden="true"
+        />
+
+        <div className={styles.secondaryContent}>
+          <h3 className={styles.secondaryTitle}>
+            {highlight.title}
+          </h3>
+
+          <span
+            className={styles.cardArrow}
+            aria-hidden="true"
+          >
+            <ArrowUpRight size={20} strokeWidth={1.7} />
+          </span>
+        </div>
+      </Link>
+    </ScrollReveal>
+  );
+}
+
+/* ==========================================
+   SECCIÓN PÚBLICA
+========================================== */
+
+function CommunityHighlights() {
+  const [highlights, setHighlights] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
+
   useEffect(() => {
-    let cancelled = false;
+    const controller = new AbortController();
 
     async function loadHighlights() {
+      setLoading(true);
+      setError("");
+
       try {
         const response = await fetch("/community-highlights", {
+          signal: controller.signal,
           credentials: "include",
+          cache: "no-store",
         });
 
         if (!response.ok) {
-          throw new Error("No fue posible cargar los destacados");
+          throw new Error(
+            `No fue posible cargar las fotografías (${response.status}).`
+          );
         }
 
         const data = await response.json();
 
-        if (!cancelled && Array.isArray(data) && data.length > 0) {
-          setHighlights(data);
+        if (!Array.isArray(data)) {
+          throw new Error(
+            "La API devolvió un formato de fotografías inesperado."
+          );
         }
-      } catch {
-        if (!cancelled) {
-          setHighlights(staticHighlights);
+
+        if (controller.signal.aborted) return;
+
+        // La API ya devuelve las fotografías publicadas y ordenadas.
+        setHighlights(
+          data.filter((item) => item && item.id && item.image)
+        );
+      } catch (err) {
+        if (!controller.signal.aborted) {
+          setError(
+            err.message || "No fue posible cargar las fotografías."
+          );
         }
       } finally {
-        if (!cancelled) {
+        if (!controller.signal.aborted) {
           setLoading(false);
         }
       }
@@ -57,105 +192,105 @@ function CommunityHighlights() {
 
     loadHighlights();
 
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    return () => controller.abort();
+  }, [reloadKey]);
 
-  if (loading || !mainHighlight) {
+  const [mainHighlight, ...secondaryHighlights] = highlights;
+
+  // Sin publicaciones, la sección no ocupa espacio en el inicio.
+  if (!loading && !error && !mainHighlight) {
     return null;
   }
 
   return (
-    <section className="community-section">
-      <ScrollReveal className="community-section-header">
-        <div>
-          <span className="section-label">
-            GENSTI EN MOVIMIENTO
-          </span>
+    <section
+      className={styles.section}
+      aria-labelledby="community-highlights-title"
+      aria-busy={loading}
+    >
+      <div className={styles.container}>
+        <ScrollReveal className={styles.sectionHeader}>
+          <div className={styles.heading}>
+            <span className={styles.sectionLabel}>
+              GENSTI EN MOVIMIENTO
+            </span>
 
-          <h2>Una comunidad que también se vive</h2>
-
-          <p>
-            Viajes, encuentros, talleres y experiencias que conectan a quienes
-            hacen parte de Ingeniería de Sistemas.
-          </p>
-        </div>
-
-        <Link
-          className="community-main-link"
-          to="/eventos"
-        >
-          Explorar eventos
-
-          <ArrowUpRight
-            size={17}
-            strokeWidth={1.8}
-            aria-hidden="true"
-          />
-        </Link>
-      </ScrollReveal>
-
-      <div className="community-gallery">
-        <ScrollReveal
-          className="community-featured-reveal"
-          delay={0.08}
-        >
-          <div
-            className="community-featured-scroll-target"
-            ref={featuredRef}
-          >
-            <Link
-              className="community-featured"
-              to={`/eventos/${mainHighlight.eventId}`}
+            <h2
+              id="community-highlights-title"
+              className={styles.sectionTitle}
             >
-              <div className="community-featured-image-window">
-                <m.img
-                  src={mainHighlight.image}
-                  alt={mainHighlight.title}
-                  style={{
-                    y: featuredImageY,
-                  }}
-                />
-              </div>
-
-              <div className="community-overlay">
-                <span>{mainHighlight.category}</span>
-
-                <h3>{mainHighlight.title}</h3>
-
-                <p>{mainHighlight.description}</p>
-              </div>
-            </Link>
+              Una comunidad que también se vive
+            </h2>
           </div>
+
+          <Link
+            to="/botg"
+            className={styles.mainLink}
+          >
+            Explorar TBOG
+
+            <ArrowUpRight
+              size={18}
+              strokeWidth={1.8}
+              aria-hidden="true"
+            />
+          </Link>
         </ScrollReveal>
 
-        <div className="community-secondary">
-          {secondaryHighlights.map((highlight, index) => (
-            <ScrollReveal
-              key={highlight.id}
-              className="community-secondary-reveal"
-              delay={0.14 + index * 0.1}
-            >
-              <Link
-                className="community-secondary-card"
-                to={`/eventos/${highlight.eventId}`}
-              >
-                <div className="community-secondary-image-window">
-                  <img
-                    src={highlight.image}
-                    alt={highlight.title}
-                  />
-                </div>
+        {loading ? (
+          <div
+            className={styles.loadingState}
+            role="status"
+          >
+            <span
+              className={styles.loadingIndicator}
+              aria-hidden="true"
+            />
+            <span>Cargando momentos de nuestra comunidad...</span>
+          </div>
+        ) : error ? (
+          <div
+            className={styles.errorState}
+            role="alert"
+          >
+            <p>{error}</p>
 
-                <div className="community-secondary-overlay">
-                  <span>{highlight.category}</span>
-                  <h3>{highlight.title}</h3>
-                </div>
-              </Link>
-            </ScrollReveal>
-          ))}
-        </div>
+            <button
+              type="button"
+              className={styles.retryButton}
+              onClick={() =>
+                setReloadKey((value) => value + 1)
+              }
+            >
+              Volver a intentar
+            </button>
+          </div>
+        ) : (
+          <div
+            className={[
+              styles.gallery,
+              secondaryHighlights.length === 0
+                ? styles.singlePhoto
+                : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            <FeaturedPhoto highlight={mainHighlight} />
+
+            {secondaryHighlights.length > 0 && (
+              <div className={styles.secondaryGrid}>
+                {secondaryHighlights.map((highlight, index) => (
+                  <SecondaryPhoto
+                    key={highlight.id}
+                    highlight={highlight}
+                    index={index}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

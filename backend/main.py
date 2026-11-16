@@ -36,24 +36,35 @@ from email_verification import (
 )
 
 from news_routes import router as news_router
+from news_images_routes import router as news_images_router
 from calendar_routes import router as calendar_router
 from pqrs_routes import router as pqrs_router
 from event_routes import router as event_router
+from event_images_routes import router as event_images_router
 from community_posts_routes import router as community_posts_router
 from faq_routes import router as faq_router
 from users_routes import router as users_router
+from tbog_routes import router as tbog_router
+
+from community_highlights_routes import (
+    router as community_highlights_router,
+)
 
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="GENSTI API")
 
+app.include_router(community_highlights_router)
 app.include_router(news_router)
+app.include_router(news_images_router)
 app.include_router(calendar_router)
 app.include_router(pqrs_router)
 app.include_router(event_router)
+app.include_router(event_images_router)
 app.include_router(community_posts_router)
 app.include_router(faq_router)
 app.include_router(users_router)
+app.include_router(tbog_router)
 
 frontend_origins = [
     origin.strip()

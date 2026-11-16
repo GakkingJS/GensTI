@@ -1985,3 +1985,28 @@
     transform: none;
   }
 }
+
+
+.contentState {
+  padding: 28px 20px;
+  color: inherit;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.contentState p {
+  margin: 0 0 16px;
+}
+
+.studentName {
+  margin: 12px 0 18px;
+  color: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.modalContent p[id="tbog-modal-description"] {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}

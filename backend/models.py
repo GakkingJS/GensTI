@@ -754,6 +754,29 @@ class CommunityPost(Base):
     content = Column(Text, nullable=False)
     category = Column(String(60), nullable=False, default="General")
 
+    section = Column(
+        String(20),
+        nullable=False,
+        server_default="community",
+    )
+
+    image_key = Column(
+        String(100),
+        nullable=True,
+    )
+
+    image_alt = Column(
+        String(300),
+        nullable=False,
+        server_default="",
+    )
+
+    image_authorized = Column(
+        Boolean,
+        nullable=False,
+        server_default="false",
+    )
+
     status = Column(String(20), nullable=False, default="pending", index=True)
     admin_note = Column(Text, nullable=True)
 
@@ -831,3 +854,260 @@ class FaqDocument(Base):
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     faq = relationship("FaqItem", back_populates="documents")
+
+
+class TbogEntry(Base):
+    __tablename__ = "tbog_entries"
+
+    __table_args__ = (
+        CheckConstraint(
+            "content_type IN ('recognition', 'gallery')",
+            name="ck_tbog_entries_content_type",
+        ),
+        CheckConstraint(
+            "status IN ('draft', 'published', 'archived')",
+            name="ck_tbog_entries_status",
+        ),
+        CheckConstraint(
+            "category IN "
+            "('semilleros', 'saber-pro', 'proyectos', 'excelencia')",
+            name="ck_tbog_entries_category",
+        ),
+        CheckConstraint(
+            "status != 'published' OR "
+            "(publication_authorized = true AND image_key IS NOT NULL)",
+            name="ck_tbog_entries_published",
+        ),
+        Index(
+            "ix_tbog_entries_status_type",
+            "status",
+            "content_type",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+
+    content_type: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        server_default="recognition",
+    )
+
+    student_name: Mapped[str | None] = mapped_column(
+        String(200),
+        nullable=True,
+    )
+
+    title: Mapped[str] = mapped_column(
+        String(200),
+        nullable=False,
+    )
+
+    description: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    category: Mapped[str] = mapped_column(
+        String(30),
+        nullable=False,
+        server_default="excelencia",
+    )
+
+    period: Mapped[str] = mapped_column(
+        String(120),
+        nullable=False,
+        server_default="",
+    )
+
+    image_key: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    image_alt: Mapped[str] = mapped_column(
+        String(300),
+        nullable=False,
+        server_default="",
+    )
+
+    image_position: Mapped[str] = mapped_column(
+        String(30),
+        nullable=False,
+        server_default="center",
+    )
+
+    featured: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        server_default="false",
+    )
+
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        server_default="draft",
+    )
+
+    publication_authorized: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        server_default="false",
+    )
+
+    verified_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
+    created_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    updated_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )
+
+class CommunityHighlight(Base):
+    __tablename__ = "community_highlights"
+
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('draft', 'published', 'archived')",
+            name="ck_community_highlights_status",
+        ),
+        CheckConstraint(
+            "sort_order >= 0",
+            name="ck_community_highlights_sort_order",
+        ),
+        CheckConstraint(
+            "status != 'published' OR "
+            "(publication_authorized = true "
+            "AND image_key IS NOT NULL)",
+            name="ck_community_highlights_published",
+        ),
+        Index(
+            "ix_community_highlights_status_order",
+            "status",
+            "sort_order",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4,
+    )
+
+    title: Mapped[str] = mapped_column(
+        String(200),
+        nullable=False,
+    )
+
+    description: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+
+    category: Mapped[str] = mapped_column(
+        String(80),
+        nullable=False,
+    )
+
+    sort_order: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        server_default="0",
+    )
+
+    image_key: Mapped[str | None] = mapped_column(
+        String(100),
+        nullable=True,
+    )
+
+    image_alt: Mapped[str] = mapped_column(
+        String(300),
+        nullable=False,
+        server_default="",
+    )
+
+    image_position: Mapped[str] = mapped_column(
+        String(30),
+        nullable=False,
+        server_default="center",
+    )
+
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        server_default="draft",
+    )
+
+    publication_authorized: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        server_default="false",
+    )
+
+    verified_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    verified_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    )
+
+    created_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    updated_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now(),
+    )

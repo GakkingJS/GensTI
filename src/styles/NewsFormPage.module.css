@@ -1,0 +1,1083 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap");
+
+/* ==========================================================================
+   NewsFormPage — GENSTI
+   Formulario de administración: claro, ordenado y con la misma identidad
+   de agua (aguamarina, verde y azul) del resto del portal.
+   Pensado primero para celular: campos de 16px (sin zoom en iOS), zonas
+   táctiles de 48px y una barra de acciones fija abajo.
+   ========================================================================== */
+
+.page {
+  --ink: #08333a;
+  --muted: #4a6f74;
+  --line: rgba(8, 51, 58, 0.12);
+  --field-border: #cfe3e1;
+  --field-bg: #f7fcfb;
+  --teal: #0fa3a3;
+  --teal-deep: #0a6f7a;
+  --aqua: #2bd0b5;
+  --green: #34c77b;
+  --danger: #a3281a;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.2, 1.15, 0.3, 1);
+
+  position: relative;
+  width: min(980px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: clamp(32px, 5vw, 56px) 0 clamp(56px, 8vw, 88px);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+.page,
+.page * {
+  box-sizing: border-box;
+}
+
+/* ==========================================================================
+   ENCABEZADO
+   ========================================================================== */
+
+.header {
+  position: relative;
+  isolation: isolate;
+  max-width: 780px;
+  margin-bottom: clamp(24px, 4vw, 38px);
+}
+
+/* Resplandor de agua detrás del título */
+.header::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: -50px;
+  right: 0;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(43, 208, 181, 0.35), transparent 68%);
+  filter: blur(30px);
+  pointer-events: none;
+  animation: drift 20s ease-in-out infinite alternate;
+}
+
+.eyebrow,
+.title,
+.description,
+.backLink {
+  animation: rise 0.8s var(--ease-out) backwards;
+}
+
+.eyebrow { animation-delay: 0.05s; }
+.title { animation-delay: 0.15s; }
+.description { animation-delay: 0.27s; }
+.backLink { animation-delay: 0.38s; }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 16px;
+  padding: 0.42rem 0.95rem 0.42rem 0.8rem;
+  border: 1px solid rgba(15, 163, 163, 0.28);
+  border-radius: 999px;
+  background: rgba(15, 163, 163, 0.1);
+  color: var(--teal-deep);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: ping 2.4s ease-out infinite;
+}
+
+.title {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5.2vw, 3.1rem);
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+}
+
+.description {
+  max-width: 62ch;
+  margin: 16px 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.backLink {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  padding: 4px 0;
+  color: var(--teal-deep);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.35s var(--ease-out), color 0.2s ease;
+}
+
+.backLink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--teal), var(--green));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease-out);
+}
+
+.backLink:hover {
+  color: var(--ink);
+  transform: translateX(-3px);
+}
+
+.backLink:hover::after {
+  transform: scaleX(1);
+}
+
+/* ==========================================================================
+   ESTADOS GLOBALES
+   ========================================================================== */
+
+.notice {
+  margin: 0;
+  padding: 18px 22px;
+  border: 1px solid rgba(29, 143, 209, 0.28);
+  border-left-width: 3px;
+  border-radius: 6px 16px 16px 6px;
+  background: rgba(29, 143, 209, 0.08);
+  color: #1b5f86;
+  font-size: 0.95rem;
+  line-height: 1.7;
+  animation: rise 0.6s var(--ease-out) backwards;
+}
+
+.loadingState {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0;
+  padding: 28px 0;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+/* Gota que emite ondas */
+.loadingState::before {
+  content: "";
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--aqua);
+  animation: ripple-dot 2s ease-out infinite;
+}
+
+.successMessage,
+.errorMessage {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 0 0 20px;
+  padding: 13px 16px;
+  border: 1px solid;
+  border-left-width: 3px;
+  border-radius: 6px 16px 16px 6px;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.successMessage::before,
+.errorMessage::before {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.successMessage {
+  border-color: rgba(52, 199, 123, 0.45);
+  background: rgba(52, 199, 123, 0.12);
+  color: #11623a;
+  animation: pop 0.45s var(--spring) backwards;
+}
+
+.successMessage::before {
+  content: "✓";
+  background: var(--green);
+}
+
+.errorMessage {
+  border-color: rgba(214, 70, 45, 0.4);
+  background: rgba(214, 70, 45, 0.08);
+  color: var(--danger);
+  animation: shake 0.5s ease-out;
+}
+
+.errorMessage::before {
+  content: "!";
+  background: #d6462d;
+}
+
+/* ==========================================================================
+   FORMULARIO
+   ========================================================================== */
+
+.form {
+  --form-pad: clamp(20px, 4vw, 38px);
+
+  position: relative;
+  padding: var(--form-pad);
+  /* "clip" y no "hidden": recorta las esquinas sin romper la barra fija */
+  overflow: clip;
+  border: 1.5px solid rgba(15, 163, 163, 0.2);
+  /* Esquina inferior izquierda cerrada: firma visual de GENSTI */
+  border-radius: 28px 28px 28px 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 40px 70px -42px rgba(8, 51, 58, 0.38),
+    0 6px 16px -10px rgba(8, 51, 58, 0.12);
+  animation: rise 0.8s var(--ease-out) 0.25s backwards;
+}
+
+/* Hilo de agua en el borde superior */
+.form::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--teal), var(--aqua), var(--green), var(--teal));
+  background-size: 200% 100%;
+  animation: flow 9s linear infinite;
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.label {
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.005em;
+}
+
+/* El asterisco de "obligatorio" */
+.label span {
+  margin-left: 2px;
+  color: var(--teal);
+}
+
+/* ---------- Campos ---------- */
+
+.input,
+.select,
+.textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1.5px solid var(--field-border);
+  border-radius: 14px;
+  background-color: var(--field-bg);
+  /* Línea de agua que se dibuja al enfocar */
+  background-image: linear-gradient(90deg, var(--teal), var(--aqua), var(--green));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0 3px;
+  color: var(--ink);
+  font: inherit;
+  /* 16px: evita el zoom automático de iOS al enfocar */
+  font-size: 1rem;
+  line-height: 1.55;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    background-size 0.5s var(--ease-out),
+    box-shadow 0.3s ease;
+}
+
+.input,
+.select {
+  min-height: 50px;
+  padding: 12px 15px;
+}
+
+.textarea {
+  min-height: 220px;
+  padding: 15px 16px;
+  resize: vertical;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: #8aa7aa;
+}
+
+.input:hover:not(:disabled),
+.select:hover:not(:disabled),
+.textarea:hover:not(:disabled) {
+  border-color: #a9cfcb;
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--teal);
+  background-color: #fff;
+  background-size: 100% 3px;
+  box-shadow: 0 0 0 4px rgba(15, 163, 163, 0.14);
+}
+
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  border-color: #e0ecea;
+  background-color: #f1f6f5;
+  color: #7d9a9d;
+  cursor: not-allowed;
+}
+
+/* Select con flecha propia */
+.select {
+  padding-right: 44px;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230a6f7a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"),
+    linear-gradient(90deg, var(--teal), var(--aqua), var(--green));
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 15px center, 0 100%;
+  background-size: 16px 16px, 0 3px;
+  cursor: pointer;
+}
+
+.select:focus {
+  background-size: 16px 16px, 100% 3px;
+}
+
+.hint,
+.counter {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.counter {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+/* ---------- Casilla "destacada" ---------- */
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 50px;
+  padding: 12px 15px;
+  border: 1.5px solid var(--field-border);
+  border-radius: 14px;
+  background: var(--field-bg);
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  cursor: pointer;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.checkbox:hover {
+  border-color: #a9cfcb;
+}
+
+.checkbox:has(input:checked) {
+  border-color: var(--teal);
+  background: rgba(15, 163, 163, 0.09);
+  color: var(--ink);
+}
+
+.checkbox input {
+  position: relative;
+  flex-shrink: 0;
+  display: grid;
+  place-content: center;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  border: 1.5px solid #9fc7c4;
+  border-radius: 8px 8px 8px 3px;
+  background: #fff;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.35s var(--spring);
+}
+
+/* Marca de verificación */
+.checkbox input::after {
+  content: "";
+  width: 11px;
+  height: 6px;
+  margin-top: -2px;
+  border-bottom: 2.5px solid #04303a;
+  border-left: 2.5px solid #04303a;
+  transform: rotate(-45deg) scale(0);
+  transition: transform 0.3s var(--spring);
+}
+
+.checkbox input:checked {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--aqua), var(--green));
+  transform: scale(1.06);
+}
+
+.checkbox input:checked::after {
+  transform: rotate(-45deg) scale(1);
+}
+
+/* ==========================================================================
+   IMAGEN DE PORTADA
+   ========================================================================== */
+
+.imageSection {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: clamp(16px, 3vw, 26px);
+  border: 1px solid rgba(15, 163, 163, 0.2);
+  border-radius: 22px 22px 22px 6px;
+  background: linear-gradient(180deg, rgba(234, 246, 242, 0.8), rgba(247, 252, 251, 0.6));
+}
+
+.imageIntro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.imageTitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.optional {
+  padding: 4px 10px;
+  border: 1px solid rgba(15, 163, 163, 0.28);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--teal-deep);
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+/* Toda el área es el botón: el input real queda encima, invisible */
+.uploadArea {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 190px;
+  padding: 24px 18px;
+  border: 2px dashed rgba(43, 208, 181, 0.6);
+  border-radius: 20px 20px 20px 6px;
+  background: rgba(43, 208, 181, 0.07);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    border-color 0.3s ease,
+    background-color 0.3s ease,
+    transform 0.45s var(--spring);
+}
+
+.uploadArea:hover {
+  border-color: var(--teal);
+  background: rgba(43, 208, 181, 0.14);
+  transform: translateY(-2px);
+}
+
+.uploadArea:focus-within {
+  border-color: var(--teal);
+  outline: 3px solid var(--green);
+  outline-offset: 4px;
+}
+
+.uploadArea:has(.fileInput:disabled) {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.uploadIcon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 4px;
+  border-radius: 17px 17px 17px 5px;
+  background: linear-gradient(135deg, var(--teal), var(--aqua));
+  color: #fff;
+  box-shadow: 0 14px 24px -14px rgba(15, 163, 163, 0.9);
+  animation: bob 4s ease-in-out infinite;
+}
+
+/* Onda que sale del icono */
+.uploadIcon::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--aqua);
+  border-radius: inherit;
+  opacity: 0;
+  animation: ripple-box 3s ease-out infinite;
+}
+
+.uploadArea:hover .uploadIcon {
+  animation-duration: 1.6s;
+}
+
+.uploadTitle {
+  color: var(--teal-deep);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.uploadDescription {
+  max-width: 260px;
+  color: var(--muted);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+
+.fileInput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 0;
+}
+
+.fileInput:disabled {
+  cursor: not-allowed;
+}
+
+.urlField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* ---------- Vista previa ---------- */
+
+.preview {
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  overflow: hidden;
+  border: 1.5px solid rgba(15, 163, 163, 0.22);
+  border-radius: 20px 20px 20px 6px;
+  /* Cuadrícula tipo "transparencia", en tono aguamarina */
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #e6f3f0 25%, transparent 25%),
+    linear-gradient(-45deg, #e6f3f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e6f3f0 75%),
+    linear-gradient(-45deg, transparent 75%, #e6f3f0 75%);
+  background-size: 22px 22px;
+  background-position: 0 0, 0 11px, 11px -11px, -11px 0;
+  animation: pop 0.5s var(--spring) backwards;
+}
+
+.preview img {
+  display: block;
+  width: 100%;
+  max-height: 430px;
+  object-fit: contain;
+}
+
+.removeButton {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 42px;
+  padding: 8px 14px;
+  border: 1px solid rgba(214, 70, 45, 0.3);
+  border-radius: 999px 999px 999px 6px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #b5321f;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease,
+    transform 0.35s var(--spring);
+}
+
+.removeButton:hover {
+  border-color: #d6462d;
+  background: #d6462d;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.removeButton:active {
+  transform: scale(0.95);
+}
+
+.imageFallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 140px;
+  border: 1.5px dashed rgba(15, 163, 163, 0.3);
+  border-radius: 20px 20px 20px 6px;
+  color: #5f8084;
+  background: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+}
+
+.uploadingState {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 15px;
+  overflow: hidden;
+  border: 1px solid rgba(15, 163, 163, 0.3);
+  border-radius: 12px 12px 12px 4px;
+  background: rgba(15, 163, 163, 0.09);
+  color: var(--teal-deep);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Barra indeterminada que recorre el borde inferior */
+.uploadingState::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 40%;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--teal), var(--green));
+  animation: slide 1.3s ease-in-out infinite;
+}
+
+.spinner {
+  flex-shrink: 0;
+  animation: spin 850ms linear infinite;
+}
+
+/* ==========================================================================
+   ACCIONES
+   ========================================================================== */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.primaryButton,
+.secondaryButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 12px 26px;
+  border-radius: 14px 14px 14px 5px;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Botón principal: el agua sube al pasar el cursor */
+.primaryButton {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid #36c6c6;
+  background: #36c6c6;
+  /* Texto oscuro: con blanco sobre aguamarina el contraste es bajo */
+  color: #04303a;
+  box-shadow: 0 16px 26px -16px rgba(15, 163, 163, 0.9);
+  transition: transform 0.4s var(--spring), box-shadow 0.3s ease;
+}
+
+.primaryButton::before {
+  content: "";
+  position: absolute;
+  left: -5%;
+  right: -5%;
+  top: -30%;
+  bottom: 0;
+  z-index: -1;
+  border-radius: 50% 50% 0 0 / 28% 28% 0 0;
+  background: linear-gradient(135deg, #53c7c1, #72b947);
+  transform: translateY(105%);
+  transition: transform 0.65s var(--ease-out);
+}
+
+.primaryButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 30px -16px rgba(15, 163, 163, 0.95);
+}
+
+.primaryButton:hover:not(:disabled)::before {
+  transform: translateY(0);
+}
+
+.primaryButton:active:not(:disabled) {
+  transform: translateY(0) scale(0.985);
+}
+
+.secondaryButton {
+  border: 1.5px solid rgba(15, 163, 163, 0.3);
+  background: #fff;
+  color: var(--teal-deep);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.4s var(--spring);
+}
+
+.secondaryButton:hover {
+  border-color: var(--teal);
+  background: rgba(15, 163, 163, 0.08);
+  transform: translateY(-2px);
+}
+
+.page button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   ACCESIBILIDAD
+   ========================================================================== */
+
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible,
+.backLink:focus-visible,
+.removeButton:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 4px;
+}
+
+.checkbox:has(input:focus-visible) {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   KEYFRAMES
+   ========================================================================== */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(6px);
+  }
+}
+
+@keyframes shake {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  20% {
+    opacity: 1;
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes flow {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(-6%, 8%) scale(1.15);
+  }
+}
+
+@keyframes ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba(52, 199, 123, 0.7);
+  }
+  80%,
+  100% {
+    box-shadow: 0 0 0 9px rgba(52, 199, 123, 0);
+  }
+}
+
+@keyframes ripple-dot {
+  0% {
+    box-shadow: 0 0 0 0 rgba(43, 208, 181, 0.65);
+  }
+  100% {
+    box-shadow: 0 0 0 16px rgba(43, 208, 181, 0);
+  }
+}
+
+@keyframes ripple-box {
+  0% {
+    transform: scale(1);
+    opacity: 0.65;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+/* Tablet y móvil: una columna y barra de acciones fija abajo */
+@media (max-width: 820px) {
+  .row,
+  .imageGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .row {
+    gap: 24px;
+  }
+
+  .actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+    gap: 10px;
+    /* Se extiende hasta los bordes de la tarjeta */
+    margin: 0 calc(var(--form-pad) * -1) calc(var(--form-pad) * -1);
+    padding: 14px var(--form-pad) calc(14px + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 -14px 24px -18px rgba(8, 51, 58, 0.3);
+  }
+
+  .primaryButton {
+    flex: 1;
+  }
+
+  .secondaryButton {
+    flex: 0 0 auto;
+    padding-inline: 20px;
+  }
+}
+
+@media (max-width: 540px) {
+  .page {
+    width: calc(100% - 28px);
+    padding-top: 28px;
+  }
+
+  .form {
+    border-radius: 22px 22px 22px 8px;
+  }
+
+  .fields {
+    gap: 22px;
+  }
+
+  .textarea {
+    min-height: 190px;
+  }
+
+  .uploadArea {
+    min-height: 165px;
+    padding: 20px 14px;
+  }
+
+  .preview img {
+    max-height: 300px;
+  }
+
+  .removeButton {
+    top: 10px;
+    right: 10px;
+  }
+}
+
+/* ==========================================================================
+   MOVIMIENTO REDUCIDO
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .page *,
+  .page *::before,
+  .page *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+}

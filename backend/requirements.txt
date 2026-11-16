@@ -11,3 +11,5 @@ pwdlib[argon2]
 email-validator
 httpx
 brevo-python
+python-multipart
+Pillow

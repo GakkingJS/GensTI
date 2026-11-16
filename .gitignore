@@ -54,3 +54,5 @@ docker-data/
 
 
 cookies.txt
+backend/promote_superadmin.py
+

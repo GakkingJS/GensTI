@@ -1,5 +1,3 @@
-import { Link } from "react-router-dom";
-
 function Footer() {
   const currentYear = new Date().getFullYear();
 
@@ -22,8 +20,8 @@ function Footer() {
         <div className="site-footer-main">
           {/* Identidad */}
           <div className="site-footer-identity">
-            <Link
-              to="/"
+            <a
+              href="/"
               className="site-footer-brand"
               aria-label="GensTI, ir al inicio"
             >
@@ -40,7 +38,7 @@ function Footer() {
                 <strong>GensTI</strong>
                 <span>Ingeniería de Sistemas</span>
               </span>
-            </Link>
+            </a>
 
             <p className="site-footer-description">
               Un espacio creado para conectar, informar y apoyar
@@ -60,10 +58,19 @@ function Footer() {
           >
             <h2>Explora</h2>
 
-            <Link to="/">Inicio</Link>
-            <Link to="/botg">The Best of GensTI</Link>
-            <Link to="/parche">Parche GensTI</Link>
-            <Link to="/eventos">Eventos</Link>
+            <a href="/">Inicio</a>
+
+            <a href="/botg">
+              The Best of GensTI
+            </a>
+
+            <a href="/parche">
+              Parche GensTI
+            </a>
+
+            <a href="/eventos">
+              Eventos
+            </a>
           </nav>
 
           {/* Comunidad */}
@@ -73,13 +80,17 @@ function Footer() {
           >
             <h2>Comunidad</h2>
 
-            <Link to="/directorio">
+            <a href="/directorio">
               Directorio universitario
-            </Link>
+            </a>
 
-            <Link to="/academico">Académico</Link>
+            <a href="/academico">
+              Académico
+            </a>
 
-            <Link to="/botg#ima-gensti">IMA-GensTI</Link>
+            <a href="/botg#ima-gensti">
+              IMA-GensTI
+            </a>
           </nav>
 
           {/* Documentos legales */}
@@ -89,21 +100,21 @@ function Footer() {
           >
             <h2>Transparencia y legal</h2>
 
-            <Link to="/legal/privacidad">
+            <a
+              href="https://www.ucc.edu.co/Paginas/tratamiento-de-datos-personales-ucc.aspx"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Privacidad y tratamiento de datos
-            </Link>
+            </a>
 
-            <Link to="/legal/terminos">
-              Términos de uso
-            </Link>
-
-            <Link to="/legal/derechos-de-autor">
-              Derechos de autor e imágenes
-            </Link>
-
-            <Link to="/legal/contacto">
+            <a
+              href="https://www.ucc.edu.co/Paginas/atencion-al-ciudadano.aspx"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Contacto y solicitudes
-            </Link>
+            </a>
           </nav>
         </div>
 

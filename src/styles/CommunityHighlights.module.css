@@ -1,0 +1,674 @@
+@import url("https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap");
+
+/* ==========================================================================
+   CommunityHighlights — GENSTI
+   ========================================================================== */
+
+.section {
+  --deep: #052a35;
+  --deep-2: #073b4c;
+  --ink: #f2fffc;
+  --soft: rgba(214, 240, 236, 0.74);
+  --teal: #0fa3a3;
+  --aqua: #53c7c1;
+  --green: #72b947;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --spring: cubic-bezier(0.2, 1.15, 0.3, 1);
+  --tile-ratio: 4 / 5;
+  --stagger: clamp(1.5rem, 4vw, 3.25rem);
+
+  position: relative;
+  isolation: isolate;
+  margin: clamp(2.5rem, 6vw, 5rem) clamp(0.75rem, 2.5vw, 2rem);
+  padding: clamp(2.75rem, 6vw, 5.5rem) clamp(1.1rem, 4vw, 3rem);
+  overflow: hidden;
+  /* Esquina inferior izquierda cerrada: firma visual de GENSTI */
+  border-radius: 40px 40px 40px 10px;
+  background: linear-gradient(160deg, var(--deep) 0%, var(--deep-2) 58%, #0a4a55 100%);
+  color: var(--ink);
+  font-family: var(--font-body);
+}
+
+/* Luces de agua que derivan despacio detrás de las fotos */
+.section::before,
+.section::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 50%;
+  filter: blur(80px);
+}
+
+.section::before {
+  top: -22%;
+  right: -10%;
+  width: 52%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgba(43, 208, 181, 0.4), transparent 68%);
+  animation: drift 22s ease-in-out infinite alternate;
+}
+
+.section::after {
+  bottom: -26%;
+  left: -12%;
+  width: 54%;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, rgba(114, 185, 71, 0.28), transparent 68%);
+  animation: drift 28s ease-in-out infinite alternate-reverse;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1240px;
+  margin-inline: auto;
+}
+
+/* ==========================================================================
+   ENCABEZADO
+   ========================================================================== */
+
+.sectionHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem 2rem;
+  margin-bottom: clamp(2rem, 4.5vw, 3.75rem);
+}
+
+.heading {
+  max-width: 640px;
+}
+
+.sectionLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.1rem;
+  color: var(--aqua);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+/* Punto vivo antes de la etiqueta */
+.sectionLabel::before {
+  content: "";
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: ping 2.4s ease-out infinite;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 5vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+/* Enlace principal: el agua se rellena de izquierda a derecha */
+.mainLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 1.25rem;
+  border: 1.5px solid rgba(83, 199, 193, 0.55);
+  border-radius: 999px 999px 999px 6px;
+  background-image: linear-gradient(135deg, var(--aqua), var(--green));
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 0% 100%;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-size 0.6s var(--ease-out),
+    color 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.4s var(--spring);
+}
+
+.mainLink svg {
+  transition: transform 0.4s var(--ease-out);
+}
+
+.mainLink:hover,
+.mainLink:focus-visible {
+  border-color: transparent;
+  background-size: 100% 100%;
+  color: #04303a;
+  transform: translateY(-2px);
+}
+
+.mainLink:hover svg,
+.mainLink:focus-visible svg {
+  transform: translate(3px, -3px);
+}
+
+.mainLink:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 4px;
+}
+
+/* ==========================================================================
+   GALERÍA
+   Truco: .secondaryGrid pasa a display: contents, así la foto principal y
+   las secundarias son hermanas en una sola cuadrícula de celdas iguales.
+   ========================================================================== */
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(1rem, 2.4vw, 1.75rem);
+}
+
+.secondaryGrid {
+  display: contents;
+}
+
+.featuredReveal,
+.secondaryReveal,
+.featuredScrollTarget {
+  min-width: 0;
+}
+
+.featuredScrollTarget {
+  display: block;
+}
+
+/* Escalonado: las columnas centrales bajan un poco, como olas */
+.gallery > :nth-child(3n + 2) {
+  margin-top: var(--stagger);
+}
+
+/* Una sola foto: se muestra apaisada y centrada */
+.singlePhoto {
+  grid-template-columns: minmax(0, 760px);
+  justify-content: center;
+}
+
+.singlePhoto .featuredCard {
+  aspect-ratio: 16 / 10;
+}
+
+/* ==========================================================================
+   TARJETAS (principal y secundarias comparten estilo)
+   ========================================================================== */
+
+.featuredCard,
+.secondaryCard {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--tile-ratio);
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 28px 28px 28px 8px;
+  background: var(--deep);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow:
+    0 28px 44px -26px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  transition:
+    transform 0.6s var(--ease-out),
+    box-shadow 0.5s ease;
+  /* Flotación suave e independiente de la animación de entrada */
+  animation: float 8s ease-in-out infinite;
+}
+
+.gallery > :nth-child(even) a {
+  animation-duration: 9.5s;
+  animation-delay: -3s;
+}
+
+.gallery > :nth-child(3n) a {
+  animation-duration: 7.5s;
+  animation-delay: -5s;
+}
+
+.featuredCard:hover,
+.featuredCard:focus-visible,
+.secondaryCard:hover,
+.secondaryCard:focus-visible {
+  transform: translateY(-8px);
+  animation-play-state: paused;
+  box-shadow:
+    0 40px 56px -24px rgba(15, 163, 163, 0.6),
+    0 0 0 1.5px var(--aqua);
+}
+
+.featuredCard:focus-visible,
+.secondaryCard:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 5px;
+}
+
+/* Destello que cruza la foto al pasar el cursor */
+.featuredCard::before,
+.secondaryCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.24) 50%, transparent 62%);
+  transform: translateX(-130%);
+  transition: transform 0.9s var(--ease-out);
+}
+
+.featuredCard:hover::before,
+.featuredCard:focus-visible::before,
+.secondaryCard:hover::before,
+.secondaryCard:focus-visible::before {
+  transform: translateX(130%);
+}
+
+/* Velo aguamarina que sube desde abajo al pasar el cursor */
+.featuredCard::after,
+.secondaryCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(15, 163, 163, 0.42), transparent 62%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.featuredCard:hover::after,
+.featuredCard:focus-visible::after,
+.secondaryCard:hover::after,
+.secondaryCard:focus-visible::after {
+  opacity: 1;
+}
+
+/* ---------- Imagen ---------- */
+
+.featuredImageWindow,
+.secondaryImageWindow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  /* Brillo de carga mientras llega la foto */
+  background: linear-gradient(110deg, #0a4552 30%, #11606d 50%, #0a4552 70%);
+  background-size: 200% 100%;
+  animation: shimmer 2.4s linear infinite;
+}
+
+.featuredImage,
+.secondaryImage {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  object-fit: cover;
+  will-change: transform;
+  transition: scale 0.9s var(--ease-out), filter 0.6s ease;
+}
+
+/* La principal es más alta que su ventana para dejar recorrido al parallax
+   (el JSX la mueve entre -6% y 6%) */
+.featuredImage {
+  top: -10%;
+  height: 120%;
+}
+
+.secondaryImage {
+  top: 0;
+  height: 100%;
+}
+
+.featuredCard:hover .featuredImage,
+.featuredCard:focus-visible .featuredImage,
+.secondaryCard:hover .secondaryImage,
+.secondaryCard:focus-visible .secondaryImage {
+  scale: 1.08;
+  filter: saturate(1.1);
+}
+
+/* Sombra inferior para que el título siempre se lea */
+.imageShade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(3, 28, 37, 0.92) 0%,
+    rgba(3, 28, 37, 0.5) 34%,
+    rgba(3, 28, 37, 0) 66%
+  );
+}
+
+/* ---------- Contenido ---------- */
+
+.featuredContent,
+.secondaryContent {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1.1rem, 2.2vw, 1.5rem);
+  transition: transform 0.5s var(--ease-out);
+}
+
+.featuredCard:hover .featuredContent,
+.featuredCard:focus-visible .featuredContent,
+.secondaryCard:hover .secondaryContent,
+.secondaryCard:focus-visible .secondaryContent {
+  transform: translateY(-4px);
+}
+
+.featuredTitle,
+.secondaryTitle {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 1.9vw, 1.4rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.cardArrow {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--ink);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease,
+    transform 0.5s var(--spring);
+}
+
+/* Mismo tamaño de icono en todas las tarjetas (el JSX usa 23 y 20) */
+.cardArrow svg {
+  width: 22px;
+  height: 22px;
+  transition: transform 0.5s var(--ease-out);
+}
+
+.featuredCard:hover .cardArrow,
+.featuredCard:focus-visible .cardArrow,
+.secondaryCard:hover .cardArrow,
+.secondaryCard:focus-visible .cardArrow {
+  border-color: transparent;
+  background: linear-gradient(135deg, var(--aqua), var(--green));
+  color: #04303a;
+  transform: scale(1.1) rotate(8deg);
+}
+
+.featuredCard:hover .cardArrow svg,
+.featuredCard:focus-visible .cardArrow svg,
+.secondaryCard:hover .cardArrow svg,
+.secondaryCard:focus-visible .cardArrow svg {
+  transform: translate(2px, -2px);
+}
+
+/* ==========================================================================
+   ESTADOS: carga y error
+   ========================================================================== */
+
+.loadingState {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 260px;
+  border: 1.5px dashed rgba(83, 199, 193, 0.35);
+  border-radius: 28px 28px 28px 8px;
+  color: var(--soft);
+  font-size: 0.98rem;
+}
+
+/* Gota que emite ondas */
+.loadingIndicator {
+  position: relative;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--aqua);
+}
+
+.loadingIndicator::before,
+.loadingIndicator::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--aqua);
+  opacity: 0;
+  animation: ripple 2s ease-out infinite;
+}
+
+.loadingIndicator::after {
+  animation-delay: 1s;
+}
+
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.1rem;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  border: 1.5px dashed rgba(255, 159, 152, 0.5);
+  border-radius: 28px 28px 28px 8px;
+  background: rgba(217, 93, 89, 0.08);
+  text-align: center;
+}
+
+.errorState p {
+  margin: 0;
+  color: #ffd7d5;
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
+.retryButton {
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 999px 999px 999px 6px;
+  background: linear-gradient(135deg, var(--aqua), var(--green));
+  color: #04303a;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.4s var(--spring), box-shadow 0.3s ease;
+}
+
+.retryButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 24px -12px rgba(83, 199, 193, 0.8);
+}
+
+.retryButton:active {
+  transform: scale(0.96);
+}
+
+.retryButton:focus-visible {
+  outline: 3px solid var(--green);
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   KEYFRAMES
+   ========================================================================== */
+
+@keyframes float {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -7px;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(5%, 4%) scale(1.12);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba(114, 185, 71, 0.7);
+  }
+  80%,
+  100% {
+    box-shadow: 0 0 0 9px rgba(114, 185, 71, 0);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(3.4);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+/* Tablet: dos columnas, la segunda baja un poco */
+@media (max-width: 960px) {
+  .gallery {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gallery > :nth-child(3n + 2) {
+    margin-top: 0;
+  }
+
+  .gallery > :nth-child(even) {
+    margin-top: calc(var(--stagger) * 0.6);
+  }
+
+  .singlePhoto {
+    grid-template-columns: minmax(0, 640px);
+  }
+}
+
+/* Móvil: una columna, fotos más apaisadas y sin escalonado */
+@media (max-width: 560px) {
+  .section {
+    --tile-ratio: 5 / 4;
+    margin-inline: 0.5rem;
+    border-radius: 28px 28px 28px 8px;
+  }
+
+  .gallery {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .gallery > :nth-child(even),
+  .gallery > :nth-child(3n + 2) {
+    margin-top: 0;
+  }
+
+  .singlePhoto {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .singlePhoto .featuredCard {
+    aspect-ratio: var(--tile-ratio);
+  }
+
+  .mainLink {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cardArrow {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+/* ==========================================================================
+   ACCESIBILIDAD: movimiento reducido
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .section::before,
+  .section::after,
+  .sectionLabel::before,
+  .featuredCard,
+  .secondaryCard,
+  .featuredImageWindow,
+  .secondaryImageWindow,
+  .loadingIndicator::before,
+  .loadingIndicator::after {
+    animation: none;
+  }
+
+  .featuredCard,
+  .secondaryCard,
+  .featuredCard::before,
+  .secondaryCard::before,
+  .featuredImage,
+  .secondaryImage,
+  .featuredContent,
+  .secondaryContent,
+  .cardArrow,
+  .cardArrow svg,
+  .mainLink,
+  .mainLink svg {
+    transition-duration: 0.01ms;
+  }
+
+  .featuredCard:hover,
+  .secondaryCard:hover {
+    transform: none;
+  }
+}

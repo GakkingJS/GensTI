@@ -1,9 +1,7 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
-
+import { Routes, Route } from "react-router-dom";
 
 import "./App.css";
-
 
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
@@ -15,61 +13,153 @@ import News from "./components/News";
 import Events from "./components/Events";
 import CommunityHighlights from "./components/CommunityHighlights";
 import Resources from "./components/Resources";
-import PqrsPage from "./pages/PqrsPage";
 import Footer from "./components/Footer";
-
-
-import ProtectedRoute from "./components/ProtectedRoute";
-import PqrsAdminPage from "./pages/PqrsAdminPage";
-
-
-import MotionProvider from "./components/MotionProvider";
-import { AuthProvider } from "./context/AuthContext";
-
-
-import CommunityPostsPage from "./pages/CommunityPostsPage";
-import AdminCommunityPostsPage from "./pages/AdminCommunityPostsPage"
-import ParchePage from "./pages/ParchePage";;
-
-
 import Chatbot from "./components/Chatbot";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+import MotionProvider from "./components/MotionProvider";
 
+import { AuthProvider } from "./context/AuthContext";
 
+/* ==========================================
+   PÁGINAS PÚBLICAS Y AUTENTICACIÓN
+========================================== */
 
-const EventsPage = lazy(() => import("./pages/EventsPage"));
-const EventsAdminPage = lazy(() => import("./pages/EventsAdminPage"));
-const NewsPage = lazy(() => import("./pages/NewsPage"));
-const NewsDetailPage = lazy(() => import("./pages/NewsDetailPage"));
-const AcademicPage = lazy(() => import("./pages/AcademicPage"));
-const AcademicDetailPage = lazy(() => import("./pages/AcademicDetailPage"));
-const ResourcesPage = lazy(() => import("./pages/ResourcesPage"));
-const ResourceDetailPage = lazy(() => import("./pages/ResourceDetailPage"));
-const VerifyEmailPage = lazy(() => import("./pages/VerifyEmailPage"));
-const Login = lazy(() => import("./pages/Login"));
-const RegisterPage = lazy(() => import("./pages/RegisterPage"));
-const BOTGPage = lazy(() => import("./pages/BOTGPage"));
+const EventsPage = lazy(
+  () => import("./pages/EventsPage")
+);
 
+const NewsPage = lazy(
+  () => import("./pages/NewsPage")
+);
 
-const AdminPage = lazy(() => import("./pages/AdminPage"));
-const AdminUsuariosPage = lazy(() => import("./pages/AdminUsuariosPage"));
-const NewsFormPage = lazy(() => import("./pages/NewsFormPage"));
+const NewsDetailPage = lazy(
+  () => import("./pages/NewsDetailPage")
+);
 
+const AcademicPage = lazy(
+  () => import("./pages/AcademicPage")
+);
 
-const DirectorioPage = lazy(() => import("./pages/DirectorioPage"));
+const AcademicDetailPage = lazy(
+  () => import("./pages/AcademicDetailPage")
+);
 
+const ResourcesPage = lazy(
+  () => import("./pages/ResourcesPage")
+);
 
-const CalendarAdminPage = lazy(() => import("./pages/CalendarAdminPage"));
+const ResourceDetailPage = lazy(
+  () => import("./pages/ResourceDetailPage")
+);
 
+const VerifyEmailPage = lazy(
+  () => import("./pages/VerifyEmailPage")
+);
+
+const Login = lazy(
+  () => import("./pages/Login")
+);
+
+const RegisterPage = lazy(
+  () => import("./pages/RegisterPage")
+);
+
+const BOTGPage = lazy(
+  () => import("./pages/BOTGPage")
+);
+
+const DirectorioPage = lazy(
+  () => import("./pages/DirectorioPage")
+);
+
+const ParchePage = lazy(
+  () => import("./pages/ParchePage")
+);
+
+const PqrsPage = lazy(
+  () => import("./pages/PqrsPage")
+);
+
+const CommunityPostsPage = lazy(
+  () => import("./pages/CommunityPostsPage")
+);
+
+/* ==========================================
+   PÁGINAS DE GESTIÓN
+========================================== */
+
+const AdminPage = lazy(
+  () => import("./pages/AdminPage")
+);
+
+const AdminUsuariosPage = lazy(
+  () => import("./pages/AdminUsuariosPage")
+);
+
+const NewsFormPage = lazy(
+  () => import("./pages/NewsFormPage")
+);
+
+const EventsAdminPage = lazy(
+  () => import("./pages/EventsAdminPage")
+);
+
+const CalendarAdminPage = lazy(
+  () => import("./pages/CalendarAdminPage")
+);
+
+const PqrsAdminPage = lazy(
+  () => import("./pages/PqrsAdminPage")
+);
+
+const AdminCommunityPostsPage = lazy(
+  () => import("./pages/AdminCommunityPostsPage")
+);
+
+const TbogAdminPage = lazy(
+  () => import("./pages/TbogAdminPage")
+);
+
+const CommunityHighlightsAdminPage = lazy(
+  () => import("./pages/CommunityHighlightsAdminPage")
+);
+
+/* ==========================================
+   PERMISOS DE ACCESO AL PANEL
+========================================== */
+
+const MANAGEMENT_PERMISSIONS = [
+  "news.create",
+  "events.create",
+  "calendar.manage",
+  "community_posts.create",
+  "community_posts.moderate",
+  "pqr.manage",
+  "users.manage",
+  "tbog.manage",
+  "community_highlights.manage",
+];
+
+/* ==========================================
+   ESTADO DE CARGA
+========================================== */
 
 function PageLoading() {
   return (
-    <div className="page-loading" role="status" aria-live="polite">
+    <div
+      className="page-loading"
+      role="status"
+      aria-live="polite"
+    >
       <span>Cargando...</span>
     </div>
   );
 }
 
+/* ==========================================
+   INICIO
+========================================== */
 
 function Home() {
   return (
@@ -87,133 +177,74 @@ function Home() {
   );
 }
 
+/* ==========================================
+   LAYOUT PRINCIPAL
+========================================== */
 
 function MainLayout() {
   return (
     <>
       <Navbar />
 
-
       <main>
         <Routes>
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute permission="users.manage">
-                <AdminPage />
-              </ProtectedRoute>
-            }
-          />
+          {/* PÁGINAS PÚBLICAS */}
 
           <Route
-            path="/admin/usuarios"
-            element={
-              <ProtectedRoute permission="users.manage">
-                <AdminUsuariosPage />
-              </ProtectedRoute>
-            }
+            path="/"
+            element={<Home />}
           />
-
-
-          <Route
-            path="/admin/noticias/crear"
-            element={
-              <ProtectedRoute permission="news.create">
-                <NewsFormPage />
-              </ProtectedRoute>
-            }
-          />
-
-
-          <Route
-            path="/admin/calendario"
-            element={
-              <ProtectedRoute permission="calendar.manage">
-                <CalendarAdminPage />
-              </ProtectedRoute>
-            }
-          />
-
-
-          <Route
-            path="/admin/eventos"
-            element={
-              <ProtectedRoute permission="events.manage">
-                <EventsAdminPage />
-              </ProtectedRoute>
-            }
-          />
-
-
-          <Route
-            path="/admin/noticias/:newsId/editar"
-            element={
-              <ProtectedRoute permission="news.edit">
-                <NewsFormPage />
-              </ProtectedRoute>
-            }
-          />
-
-
-          <Route
-            path="/admin/pqrs"
-            element={
-              <ProtectedRoute permission="pqr.manage">
-                <PqrsAdminPage />
-              </ProtectedRoute>
-            }
-          />
-
-
-          <Route
-            path="/comunidad/publicaciones"
-            element={<CommunityPostsPage />}
-          />
-
-
-          <Route
-            path="/admin/comunidad/publicaciones"
-            element={<AdminCommunityPostsPage />}
-          />
-
-
-          <Route path="/" element={<Home />} />
-
 
           <Route
             path="/directorio"
             element={<DirectorioPage />}
           />
 
+          <Route
+            path="/eventos"
+            element={<EventsPage />}
+          />
 
-          <Route path="/eventos" element={<EventsPage />} />
+          <Route
+            path="/botg"
+            element={<BOTGPage />}
+          />
 
+          <Route
+            path="/academico"
+            element={<AcademicPage />}
+          />
 
-          <Route path="/botg" element={<BOTGPage />} />
+          <Route
+            path="/parche"
+            element={<ParchePage />}
+          />
 
+          {/* NOTICIAS */}
 
           <Route
             path="/noticias"
             element={
-              <ProtectedRoute permission="news.view">
+              <ProtectedRoute
+                permission="news.view"
+              >
                 <NewsPage />
               </ProtectedRoute>
             }
           />
 
-
           <Route
             path="/noticias/:id"
             element={
-              <ProtectedRoute permission="news.view">
+              <ProtectedRoute
+                permission="news.view"
+              >
                 <NewsDetailPage />
               </ProtectedRoute>
             }
           />
 
-
-          <Route path="/academico" element={<AcademicPage />} />
-
+          {/* CONTENIDO PARA ESTUDIANTES */}
 
           <Route
             path="/academico/:id"
@@ -224,17 +255,6 @@ function MainLayout() {
             }
           />
 
-
-          <Route
-            path="/pqrs"
-            element={
-              <ProtectedRoute>
-                <PqrsPage />
-              </ProtectedRoute>
-            }
-          />
-
-
           <Route
             path="/recursos"
             element={
@@ -243,7 +263,6 @@ function MainLayout() {
               </ProtectedRoute>
             }
           />
-
 
           <Route
             path="/recursos/:id"
@@ -254,37 +273,196 @@ function MainLayout() {
             }
           />
 
-          <Route path="/parche" element={<ParchePage />} />
+          {/* PQRS */}
+
+          <Route
+            path="/pqrs"
+            element={
+              <ProtectedRoute
+                permission="pqr.create"
+              >
+                <PqrsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* COMUNIDAD */}
+
+          <Route
+            path="/comunidad/publicaciones"
+            element={
+              <ProtectedRoute
+                permission="community_posts.create"
+              >
+                <CommunityPostsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* PANEL DE GESTIÓN */}
+
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute
+                anyPermissions={
+                  MANAGEMENT_PERMISSIONS
+                }
+              >
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* GESTIÓN DE NOTICIAS */}
+
+          <Route
+            path="/admin/noticias/crear"
+            element={
+              <ProtectedRoute
+                permission="news.create"
+              >
+                <NewsFormPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/noticias/:newsId/editar"
+            element={
+              <ProtectedRoute
+                permission="news.edit"
+              >
+                <NewsFormPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* GESTIÓN DE EVENTOS */}
+
+          <Route
+            path="/admin/eventos"
+            element={
+              <ProtectedRoute
+                anyPermissions={[
+                  "events.manage",
+                  "events.create",
+                  "events.edit",
+                ]}
+              >
+                <EventsAdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* CALENDARIO ACADÉMICO */}
+
+          <Route
+            path="/admin/calendario"
+            element={
+              <ProtectedRoute
+                permission="calendar.manage"
+              >
+                <CalendarAdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* MODERACIÓN DE PUBLICACIONES */}
+
+          <Route
+            path="/admin/comunidad/publicaciones"
+            element={
+              <ProtectedRoute
+                permission="community_posts.moderate"
+              >
+                <AdminCommunityPostsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* GESTIÓN DE PQRS */}
+
+          <Route
+            path="/admin/pqrs"
+            element={
+              <ProtectedRoute
+                permission="pqr.manage"
+              >
+                <PqrsAdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* USUARIOS Y ROLES */}
+
+          <Route
+            path="/admin/usuarios"
+            element={
+              <ProtectedRoute
+                permission="users.manage"
+              >
+                <AdminUsuariosPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* GESTIÓN DE TBOG */}
+
+          <Route
+            path="/admin/tbog"
+            element={
+              <ProtectedRoute
+                permission="tbog.manage"
+              >
+                <TbogAdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* FOTOS DE LA COMUNIDAD */}
+
+          <Route
+            path="/admin/fotos-comunidad"
+            element={
+              <ProtectedRoute
+                permission="community_highlights.manage"
+              >
+                <CommunityHighlightsAdminPage />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* RUTA NO ENCONTRADA */}
+
+          <Route
+            path="*"
+            element={
+              <section className="page-loading">
+                <div>
+                  <h1>Página no encontrada</h1>
+
+                  <p>
+                    La dirección solicitada no existe
+                    en GENSTI.
+                  </p>
+                </div>
+              </section>
+            }
+          />
         </Routes>
-
-        
-
-
-        
       </main>
 
-
       <Footer />
-
 
       <Chatbot />
     </>
   );
 }
 
-
-function VerifyEmailRoute() {
-  const location = useLocation();
-
-
-  return (
-    <VerifyEmailPage
-      key={location.key}
-      hash={location.hash}
-    />
-  );
-}
-
+/* ==========================================
+   APLICACIÓN
+========================================== */
 
 function App() {
   return (
@@ -293,19 +471,25 @@ function App() {
         <div className="app">
           <Suspense fallback={<PageLoading />}>
             <Routes>
-              <Route path="/login" element={<Login />} />
+              <Route
+                path="/login"
+                element={<Login />}
+              />
 
-
-              <Route path="/registro" element={<RegisterPage />} />
-
+              <Route
+                path="/registro"
+                element={<RegisterPage />}
+              />
 
               <Route
                 path="/verificar-correo"
                 element={<VerifyEmailPage />}
               />
 
-
-              <Route path="/*" element={<MainLayout />} />
+              <Route
+                path="/*"
+                element={<MainLayout />}
+              />
             </Routes>
           </Suspense>
         </div>
@@ -313,6 +497,5 @@ function App() {
     </AuthProvider>
   );
 }
-
 
 export default App;

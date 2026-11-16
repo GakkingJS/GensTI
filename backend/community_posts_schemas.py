@@ -1,46 +1,77 @@
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+
+PostSection = Literal["community", "opportunities"]
+PostStatus = Literal["pending", "published", "rejected"]
 
 
 class CommunityPostCreate(BaseModel):
-    title: str = Field(min_length=5, max_length=180)
-    content: str = Field(min_length=20)
-    category: str = Field(default="General", max_length=60)
+    model_config = ConfigDict(
+        str_strip_whitespace=True,
+        extra="forbid",
+    )
+
+    title: str = Field(
+        min_length=5,
+        max_length=180,
+    )
+
+    content: str = Field(
+        min_length=20,
+        max_length=20000,
+    )
+
+    category: str = Field(
+        default="General",
+        min_length=2,
+        max_length=60,
+    )
+
+    section: PostSection = "community"
 
 
 class CommunityPostReview(BaseModel):
-    status: str = Field(pattern="^(published|rejected)$")
-    admin_note: Optional[str] = None
+    model_config = ConfigDict(
+        str_strip_whitespace=True,
+        extra="forbid",
+    )
 
+    status: Literal["published", "rejected"]
 
-class CommunityPostAdmin(BaseModel):
-    id: uuid.UUID
-    author_id: uuid.UUID
-    title: str
-    content: str
-    category: str
-    status: str
-    admin_note: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
-    reviewed_at: Optional[datetime] = None
-    reviewed_by: Optional[uuid.UUID] = None
+    admin_note: str | None = Field(
+        default=None,
+        max_length=2000,
+    )
 
-    class Config:
-        from_attributes = True
+    # Permite corregir el destino antes de aprobar.
+    section: PostSection | None = None
 
 
 class CommunityPostPublic(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID
     author_id: uuid.UUID
     title: str
     content: str
     category: str
-    status: str
+    section: PostSection
+    status: PostStatus
+    image_url: str | None = None
+    image_alt: str = ""
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+
+class CommunityPostOwn(CommunityPostPublic):
+    admin_note: str | None = None
+    image_authorized: bool = False
+
+
+class CommunityPostAdmin(CommunityPostOwn):
+    updated_at: datetime
+    reviewed_at: datetime | None = None
+    reviewed_by: uuid.UUID | None = None

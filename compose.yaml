@@ -33,6 +33,19 @@ services:
       OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen3:1.7b}
 
       FRONTEND_URL: ${FRONTEND_URL:?Falta FRONTEND_URL en .env}
+
+      TBOG_UPLOAD_DIR: /app/uploads/tbog
+      COMMUNITY_UPLOAD_DIR: /app/uploads/community
+      COMMUNITY_POSTS_UPLOAD_DIR: /app/uploads/community-posts
+      NEWS_UPLOAD_DIR: /app/uploads/news
+      EVENT_UPLOAD_DIR: /app/uploads/events
+
+    volumes:
+      - tbog_uploads:/app/uploads/tbog
+      - community_uploads:/app/uploads/community
+      - community_posts_uploads:/app/uploads/community-posts
+      - news_uploads:/app/uploads/news
+      - event_uploads:/app/uploads/events
     secrets:
       - gensti_app_password
       - outbox_fernet_key
@@ -103,3 +116,8 @@ secrets:
 
 volumes:
   postgres_data:
+  tbog_uploads:
+  community_uploads:
+  community_posts_uploads:
+  news_uploads:
+  event_uploads:

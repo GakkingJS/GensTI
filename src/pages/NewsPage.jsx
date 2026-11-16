@@ -1,23 +1,36 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { news as staticNews } from "../data/news";
-import { opportunities, opportunityCategories } from "../data/opportunities";
+import {
+  ArrowUpRight,
+  ClipboardCheck,
+  ImageOff,
+  Newspaper,
+  Plus,
+  RefreshCw,
+  Send,
+  Sparkles,
+} from "lucide-react";
+
 import { useAuth } from "../context/AuthContext";
 import ScrollReveal from "../components/ScrollReveal";
 import styles from "../styles/NewsPage.module.css";
 
- 
+/* ==========================================
+   UTILIDADES
+========================================== */
+
 function formatDate(value) {
   if (!value) return "Fecha por confirmar";
 
-
   const date = new Date(
-    String(value).length === 10 ? `${value}T12:00:00` : value
+    String(value).length === 10
+      ? `${value}T12:00:00`
+      : value
   );
 
-
-  if (Number.isNaN(date.getTime())) return "Fecha por confirmar";
-
+  if (Number.isNaN(date.getTime())) {
+    return "Fecha por confirmar";
+  }
 
   return new Intl.DateTimeFormat("es-CO", {
     day: "numeric",
@@ -26,16 +39,19 @@ function formatDate(value) {
   }).format(date);
 }
 
-
 function getNewsCategory(item) {
   return item.category || item.categoria || "General";
 }
 
-
 function getNewsImage(item) {
-  return item.image_url || item.image || item.cover_image || item.imagen || "";
+  return (
+    item.image_url ||
+    item.image ||
+    item.cover_image ||
+    item.imagen ||
+    ""
+  );
 }
-
 
 function getNewsSummary(item) {
   return (
@@ -48,90 +64,117 @@ function getNewsSummary(item) {
   );
 }
 
-
 function getNewsTitle(item) {
-  return item.title || item.titulo || "Noticia";
+  return item.title || item.titulo || "Publicación";
 }
-
 
 function getNewsId(item) {
   return item.id ?? item.news_id;
 }
 
+function getTimestamp(item) {
+  const value =
+    item.published_at ||
+    item.created_at ||
+    item.fecha_publicacion;
 
-function getPermissionChecker(auth) {
-  return (permission) => {
-    if (typeof auth?.hasPermission === "function") {
-      return auth.hasPermission(permission);
-    }
+  const timestamp = new Date(value || 0).getTime();
 
-
-    if (typeof auth?.can === "function") {
-      return auth.can(permission);
-    }
-
-
-    const permissions =
-      auth?.permissions ||
-      auth?.user?.permissions ||
-      auth?.profile?.permissions ||
-      [];
-
-
-    if (Array.isArray(permissions)) {
-      return permissions.some((item) =>
-        typeof item === "string"
-          ? item === permission
-          : item?.name === permission || item?.code === permission
-      );
-    }
-
-
-    if (permissions && typeof permissions === "object") {
-      return Boolean(permissions[permission]);
-    }
-
-
-    return false;
-  };
+  return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
+async function fetchItems(url, signal) {
+  const response = await fetch(url, {
+    credentials: "include",
+    signal,
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    let detail = `No fue posible consultar el contenido (HTTP ${response.status}).`;
+
+    const data = await response
+      .json()
+      .catch(() => null);
+
+    if (typeof data?.detail === "string") {
+      detail = data.detail;
+    }
+
+    throw new Error(detail);
+  }
+
+  const data = await response.json();
+
+  const items = Array.isArray(data)
+    ? data
+    : data?.items ?? data?.news;
+
+  if (!Array.isArray(items)) {
+    throw new Error(
+      "El servidor devolvió un formato inesperado."
+    );
+  }
+
+  return items;
+}
+
+function truncateText(value, maxLength = 240) {
+  const text = String(value || "").trim();
+
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  return `${text.slice(0, maxLength).trimEnd()}...`;
+}
+
+/* ==========================================
+   IMÁGENES
+========================================== */
 
 function NewsImage({ item, featured = false }) {
   const image = getNewsImage(item);
+  const [failedImage, setFailedImage] = useState(null);
+
   const placeholderClass = featured
     ? styles.featuredPlaceholder
     : styles.cardPlaceholder;
 
-
-  if (!image) {
+  if (!image || failedImage === image) {
     return (
-      <div className={placeholderClass} aria-label="Noticia sin imagen">
+      <div className={placeholderClass}>
+        <ImageOff size={30} aria-hidden="true" />
         <span>GENSTI</span>
       </div>
     );
   }
 
-
   return (
     <img
       src={image}
-      alt={getNewsTitle(item)}
+      alt={item.image_alt || getNewsTitle(item)}
       loading="lazy"
-      onError={(event) => {
-        event.currentTarget.style.display = "none";
-      }}
+      decoding="async"
+      onError={() => setFailedImage(image)}
     />
   );
 }
 
+/* ==========================================
+   ACCIONES ADMINISTRATIVAS
+========================================== */
 
-function AdminActions({ item, canEdit, canDelete, deletingId, onDelete }) {
-  const id = getNewsId(item);
-
-
+function AdminActions({
+  item,
+  canEdit,
+  canDelete,
+  deletingId,
+  onDelete,
+}) {
   if (!canEdit && !canDelete) return null;
 
+  const id = getNewsId(item);
 
   return (
     <div className={styles.adminActions}>
@@ -144,11 +187,10 @@ function AdminActions({ item, canEdit, canDelete, deletingId, onDelete }) {
         </Link>
       )}
 
-
       {canDelete && (
         <button
-          className={`${styles.adminButton} ${styles.deleteButton}`}
           type="button"
+          className={`${styles.adminButton} ${styles.deleteButton}`}
           disabled={deletingId === id}
           onClick={() => onDelete(id)}
         >
@@ -159,204 +201,378 @@ function AdminActions({ item, canEdit, canDelete, deletingId, onDelete }) {
   );
 }
 
+/* ==========================================
+   TARJETA DE NOTICIA
+========================================== */
+
+function NewsCard({
+  item,
+  featured = false,
+  canEdit,
+  canDelete,
+  deletingId,
+  onDelete,
+}) {
+  const title = getNewsTitle(item);
+  const id = getNewsId(item);
+
+  return (
+    <article
+      className={
+        featured ? styles.featuredCard : styles.newsCard
+      }
+    >
+      <div
+        className={
+          featured ? styles.featuredVisual : styles.cardVisual
+        }
+      >
+        <NewsImage item={item} featured={featured} />
+
+        {featured && (
+          <span className={styles.featuredLabel}>
+            Última publicación
+          </span>
+        )}
+      </div>
+
+      <div
+        className={
+          featured
+            ? styles.featuredContent
+            : styles.cardContent
+        }
+      >
+        <div className={styles.meta}>
+          <span className={styles.metaCategory}>
+            {getNewsCategory(item)}
+          </span>
+
+          <span>
+            {formatDate(
+              item.published_at ||
+                item.created_at ||
+                item.fecha_publicacion
+            )}
+          </span>
+        </div>
+
+        {featured ? (
+          <h3 className={styles.featuredTitle}>{title}</h3>
+        ) : (
+          <h3 className={styles.cardTitle}>{title}</h3>
+        )}
+
+        <p
+          className={
+            featured
+              ? styles.featuredSummary
+              : styles.cardSummary
+          }
+        >
+          {truncateText(getNewsSummary(item))}
+        </p>
+
+        <Link
+          className={styles.textLink}
+          to={`/noticias/${id}`}
+        >
+          Leer noticia
+          <ArrowUpRight size={17} aria-hidden="true" />
+        </Link>
+
+        <AdminActions
+          item={item}
+          canEdit={canEdit}
+          canDelete={canDelete}
+          deletingId={deletingId}
+          onDelete={onDelete}
+        />
+      </div>
+    </article>
+  );
+}
+
+/* ==========================================
+   TARJETA DE PUBLICACIÓN APROBADA
+========================================== */
+
+function CommunityPostCard({
+  item,
+  variant = "community",
+}) {
+  const image = getNewsImage(item);
+  const [failedImage, setFailedImage] = useState(null);
+
+  return (
+    <article className={styles.newsCard}>
+      {image && failedImage !== image && (
+        <div className={styles.cardVisual}>
+          <img
+            src={image}
+            alt={item.image_alt || item.title}
+            loading="lazy"
+            decoding="async"
+            onError={() => setFailedImage(image)}
+          />
+        </div>
+      )}
+
+      <div className={styles.cardContent}>
+        <div className={styles.meta}>
+          <span className={styles.metaCategory}>
+            {item.category || "General"}
+          </span>
+
+          <span>
+            {formatDate(
+              item.published_at || item.created_at
+            )}
+          </span>
+        </div>
+
+        <h3 className={styles.cardTitle}>
+          {item.title}
+        </h3>
+
+        <p className={styles.communityContent}>
+          {truncateText(item.content, 320)}
+        </p>
+
+        <p className={styles.sectionSource}>
+          {variant === "opportunities"
+            ? "Aporte de la comunidad"
+            : "Publicación aprobada"}
+        </p>
+      </div>
+    </article>
+  );
+}
+
+/* ==========================================
+   PÁGINA PRINCIPAL
+========================================== */
 
 export default function NewsPage() {
-  const auth = useAuth();
-  const can = useMemo(() => getPermissionChecker(auth), [auth]);
-
+  const { hasPermission } = useAuth();
 
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [deletingId, setDeletingId] = useState(null);
-
+  const [newsError, setNewsError] = useState("");
+  const [newsReloadKey, setNewsReloadKey] = useState(0);
 
   const [communityPosts, setCommunityPosts] = useState([]);
   const [communityLoading, setCommunityLoading] = useState(true);
+  const [communityError, setCommunityError] = useState("");
+  const [communityReloadKey, setCommunityReloadKey] = useState(0);
 
+  const [opportunityPosts, setOpportunityPosts] = useState([]);
+  const [opportunityLoading, setOpportunityLoading] = useState(true);
+  const [opportunityError, setOpportunityError] = useState("");
+  const [opportunityReloadKey, setOpportunityReloadKey] = useState(0);
+
+  const [deletingId, setDeletingId] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
 
   const [activeSection, setActiveSection] = useState("news");
   const [newsCategory, setNewsCategory] = useState("TODAS");
-  const [opportunityCategory, setOpportunityCategory] = useState("TODAS");
+  const [opportunityCategory, setOpportunityCategory] =
+    useState("TODAS");
 
+  const canCreateNews = hasPermission("news.create");
+  const canEditNews = hasPermission("news.edit");
+  const canDeleteNews = hasPermission("news.delete");
 
-  const canCreate = can("news.create");
-  const canEdit = can("news.edit");
-  const canDelete = can("news.delete");
+  const canCreateCommunityPost = hasPermission(
+    "community_posts.create"
+  );
 
+  const canOpenModeration = hasPermission(
+    "community_posts.moderate"
+  );
 
-  const canCreateCommunityPost = can("community_posts.create");
-  const canModerateCommunityPosts = can("community_posts.moderate");
-
+  /* NOTICIAS */
 
   useEffect(() => {
-    let active = true;
-
+    const controller = new AbortController();
 
     async function loadNews() {
       setLoading(true);
-      setError("");
-
+      setNewsError("");
 
       try {
-        const response = await fetch("/news", {
-          credentials: "include",
-        });
+        const items = await fetchItems(
+          "/news",
+          controller.signal
+        );
 
-
-        if (!response.ok) {
-          throw new Error("No fue posible cargar las noticias.");
-        }
-
-
-        const data = await response.json();
-        const items = Array.isArray(data)
-          ? data
-          : data.items || data.news || [];
-
-
-        if (active) {
+        if (!controller.signal.aborted) {
           setNews(items);
         }
-      } catch {
-        if (active) {
-          setNews(staticNews);
-          setError(
-            "No se pudo consultar el servidor. Se muestran las noticias de ejemplo disponibles."
-          );
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setNewsError(error.message);
         }
       } finally {
-        if (active) setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     }
 
-
     loadNews();
 
+    return () => controller.abort();
+  }, [newsReloadKey]);
 
-    return () => {
-      active = false;
-    };
-  }, []);
-
+  /* COMUNIDAD */
 
   useEffect(() => {
-    let active = true;
-
+    const controller = new AbortController();
 
     async function loadCommunityPosts() {
       setCommunityLoading(true);
-
+      setCommunityError("");
 
       try {
-        const response = await fetch("/community-posts/feed", {
-          credentials: "include",
-        });
+        const items = await fetchItems(
+          "/community-posts/feed?section=community",
+          controller.signal
+        );
 
-
-        if (!response.ok) {
-          throw new Error();
+        if (!controller.signal.aborted) {
+          setCommunityPosts(items);
         }
-
-
-        const data = await response.json();
-
-
-        if (active) {
-          setCommunityPosts(Array.isArray(data) ? data : []);
-        }
-      } catch {
-        if (active) {
-          setCommunityPosts([]);
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setCommunityError(error.message);
         }
       } finally {
-        if (active) {
+        if (!controller.signal.aborted) {
           setCommunityLoading(false);
         }
       }
     }
 
-
     loadCommunityPosts();
 
+    return () => controller.abort();
+  }, [communityReloadKey]);
 
-    return () => {
-      active = false;
-    };
-  }, []);
+  /* OPORTUNIDADES */
 
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadOpportunityPosts() {
+      setOpportunityLoading(true);
+      setOpportunityError("");
+
+      try {
+        const items = await fetchItems(
+          "/community-posts/feed?section=opportunities",
+          controller.signal
+        );
+
+        if (!controller.signal.aborted) {
+          setOpportunityPosts(items);
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setOpportunityError(error.message);
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setOpportunityLoading(false);
+        }
+      }
+    }
+
+    loadOpportunityPosts();
+
+    return () => controller.abort();
+  }, [opportunityReloadKey]);
+
+  /* FILTROS */
 
   const publishedNews = useMemo(() => {
     return news
       .filter((item) => {
-        const status = String(item.status || item.estado || "published")
-          .toLowerCase();
+        const status = String(
+          item.status || item.estado || "published"
+        ).toLowerCase();
 
-
-        return ["published", "publicado", "publicada"].includes(status);
+        return [
+          "published",
+          "publicado",
+          "publicada",
+        ].includes(status);
       })
-      .sort((a, b) => {
-        const dateA = new Date(
-          a.published_at || a.created_at || a.fecha_publicacion || 0
-        ).getTime();
-
-
-        const dateB = new Date(
-          b.published_at || b.created_at || b.fecha_publicacion || 0
-        ).getTime();
-
-
-        return dateB - dateA;
-      });
+      .sort((a, b) => getTimestamp(b) - getTimestamp(a));
   }, [news]);
 
-
   const newsCategories = useMemo(() => {
-    const categories = [
-      ...new Set(publishedNews.map(getNewsCategory).filter(Boolean)),
+    return [
+      "TODAS",
+      ...new Set(
+        publishedNews.map(getNewsCategory).filter(Boolean)
+      ),
     ];
-
-
-    return ["TODAS", ...categories];
   }, [publishedNews]);
 
-
   const filteredNews = useMemo(() => {
-    if (newsCategory === "TODAS") return publishedNews;
-
+    if (newsCategory === "TODAS") {
+      return publishedNews;
+    }
 
     return publishedNews.filter(
       (item) => getNewsCategory(item) === newsCategory
     );
   }, [publishedNews, newsCategory]);
 
-
-  const featuredNews = filteredNews[0] || null;
-  const remainingNews = filteredNews.slice(1);
-
+  const opportunityCategories = useMemo(() => {
+    return [
+      "TODAS",
+      ...new Set(
+        opportunityPosts
+          .map((item) => item.category)
+          .filter(Boolean)
+      ),
+    ];
+  }, [opportunityPosts]);
 
   const filteredOpportunities = useMemo(() => {
-    if (opportunityCategory === "TODAS") return opportunities;
+    if (opportunityCategory === "TODAS") {
+      return opportunityPosts;
+    }
 
-
-    return opportunities.filter(
+    return opportunityPosts.filter(
       (item) => item.category === opportunityCategory
     );
-  }, [opportunityCategory]);
+  }, [opportunityPosts, opportunityCategory]);
 
+  const sortedCommunityPosts = useMemo(() => {
+    return [...communityPosts].sort(
+      (a, b) => getTimestamp(b) - getTimestamp(a)
+    );
+  }, [communityPosts]);
+
+  const featuredNews = filteredNews[0] ?? null;
+  const remainingNews = filteredNews.slice(1);
+
+  /* ELIMINACIÓN DE NOTICIAS */
 
   async function handleDelete(newsId) {
+    if (deletingId !== null) return;
+
     const confirmed = window.confirm(
       "¿Estás seguro de que deseas eliminar esta noticia?"
     );
 
-
     if (!confirmed) return;
 
-
     setDeletingId(newsId);
-    setError("");
-
+    setDeleteError("");
 
     try {
       const response = await fetch(`/news/${newsId}`, {
@@ -364,482 +580,553 @@ export default function NewsPage() {
         credentials: "include",
       });
 
-
       if (!response.ok) {
-        throw new Error("No fue posible eliminar la noticia.");
+        const data = await response.json().catch(() => null);
+
+        throw new Error(
+          typeof data?.detail === "string"
+            ? data.detail
+            : "No fue posible eliminar la noticia."
+        );
       }
 
-
       setNews((current) =>
-        current.filter((item) => getNewsId(item) !== newsId)
+        current.filter(
+          (item) => getNewsId(item) !== newsId
+        )
       );
-    } catch (deleteError) {
-      setError(
-        deleteError.message || "Ocurrió un error al eliminar la noticia."
-      );
+    } catch (error) {
+      setDeleteError(error.message);
     } finally {
       setDeletingId(null);
     }
   }
 
-
   return (
-    <main className={styles.newsPage}>
+    <section
+      className={styles.newsPage}
+      aria-labelledby="news-page-title"
+    >
+      {/* ENCABEZADO */}
+
       <ScrollReveal>
         <header className={styles.pageIntro}>
-          <p className={styles.eyebrow}>Comunidad GENSTI</p>
-          <h1 className={styles.pageTitle}>Actualidad y oportunidades</h1>
-          <p className={styles.pageDescription}>
-            Mantente al día con las novedades de la comunidad y descubre
-            oportunidades para aprender, participar y crecer profesionalmente.
+          <p className={styles.eyebrow}>
+            Comunidad GENSTI
           </p>
+
+          <h1
+            id="news-page-title"
+            className={styles.pageTitle}
+          >
+            Actualidad y oportunidades
+          </h1>
+
+          <p className={styles.pageDescription}>
+            Descubre las novedades de Ingeniería de Sistemas
+            y explora oportunidades compartidas por la comunidad.
+          </p>
+
+          {canCreateCommunityPost && (
+            <div className={styles.publishBanner}>
+              <span
+                className={styles.publishIcon}
+                aria-hidden="true"
+              >
+                <Send size={23} strokeWidth={1.7} />
+              </span>
+
+              <div className={styles.publishCopy}>
+                <h2>Tu comunidad también tiene algo que contar</h2>
+
+                <p>
+                  Comparte una iniciativa, un logro o una convocatoria.
+                  Tu publicación pasará por revisión antes de aparecer.
+                </p>
+              </div>
+
+              <div className={styles.publishActions}>
+                <Link
+                  to="/comunidad/publicaciones"
+                  className={styles.primaryAction}
+                >
+                  <Plus size={18} aria-hidden="true" />
+                  Crear publicación
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {canCreateNews && (
+            <div className={styles.newsAdminBanner}>
+              <span
+                className={styles.newsAdminIcon}
+                aria-hidden="true"
+              >
+                <Newspaper size={23} strokeWidth={1.7} />
+              </span>
+
+              <div className={styles.newsAdminCopy}>
+                <h2>Publicación institucional</h2>
+
+                <p>
+                  Crea una noticia oficial para informar a la comunidad
+                  sobre novedades, actividades y comunicados de GENSTI.
+                </p>
+              </div>
+
+              <Link
+                to="/admin/noticias/crear"
+                className={styles.newsAdminAction}
+              >
+                <Sparkles size={18} aria-hidden="true" />
+                Crear noticia
+              </Link>
+            </div>
+          )}
+
+          {canOpenModeration && (
+            <div className={styles.managementLinks}>
+              <Link
+                to="/admin/comunidad/publicaciones"
+                className={styles.secondaryAction}
+              >
+                <ClipboardCheck
+                  size={17}
+                  aria-hidden="true"
+                />
+                Moderar publicaciones
+              </Link>
+            </div>
+          )}
         </header>
       </ScrollReveal>
 
+      {/* SECCIONES */}
 
-      <nav className={styles.tabs} aria-label="Secciones de actualidad">
+      <nav
+        className={styles.tabs}
+        aria-label="Secciones de actualidad"
+      >
         <button
           type="button"
           className={`${styles.tab} ${
-            activeSection === "news" ? styles.tabActive : ""
+            activeSection === "news"
+              ? styles.tabActive
+              : ""
           }`}
           aria-pressed={activeSection === "news"}
+          aria-controls="news-section-content"
           onClick={() => setActiveSection("news")}
         >
           Noticias
-          <span className={styles.tabCount}>{publishedNews.length}</span>
+          <span className={styles.tabCount}>
+            {publishedNews.length}
+          </span>
         </button>
-
 
         <button
           type="button"
           className={`${styles.tab} ${
-            activeSection === "opportunities" ? styles.tabActive : ""
+            activeSection === "opportunities"
+              ? styles.tabActive
+              : ""
           }`}
           aria-pressed={activeSection === "opportunities"}
+          aria-controls="news-section-content"
           onClick={() => setActiveSection("opportunities")}
         >
           Oportunidades
-          <span className={styles.tabCount}>{opportunities.length}</span>
+          <span className={styles.tabCount}>
+            {opportunityPosts.length}
+          </span>
         </button>
-
 
         <button
           type="button"
           className={`${styles.tab} ${
-            activeSection === "community" ? styles.tabActive : ""
+            activeSection === "community"
+              ? styles.tabActive
+              : ""
           }`}
           aria-pressed={activeSection === "community"}
+          aria-controls="news-section-content"
           onClick={() => setActiveSection("community")}
         >
           Comunidad
-          <span className={styles.tabCount}>{communityPosts.length}</span>
+          <span className={styles.tabCount}>
+            {communityPosts.length}
+          </span>
         </button>
       </nav>
 
+      <div id="news-section-content">
+        {/* NOTICIAS */}
 
-      {error && <p className={styles.errorMessage}>{error}</p>}
+        {activeSection === "news" && (
+          <section aria-labelledby="news-section-title">
+            <div className={styles.sectionHeading}>
+              <div>
+                <h2
+                  id="news-section-title"
+                  className={styles.sectionTitle}
+                >
+                  Noticias de GENSTI
+                </h2>
 
-
-      {activeSection === "news" && (
-        <section aria-label="Noticias de GENSTI">
-          <div className={styles.sectionHeading}>
-            <div>
-              <h2 className={styles.sectionTitle}>Noticias de la comunidad</h2>
-              <p className={styles.sectionDescription}>
-                Información, novedades y actividades de interés.
-              </p>
+                <p className={styles.sectionDescription}>
+                  Información, novedades y actividades de interés.
+                </p>
+              </div>
             </div>
 
+            <div
+              className={styles.categoryFilters}
+              role="group"
+              aria-label="Filtrar noticias por categoría"
+            >
+              {newsCategories.map((category) => (
+                <button
+                  type="button"
+                  key={category}
+                  className={`${styles.categoryButton} ${
+                    newsCategory === category
+                      ? styles.categoryButtonActive
+                      : ""
+                  }`}
+                  aria-pressed={newsCategory === category}
+                  onClick={() => setNewsCategory(category)}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
 
-            {canCreate && (
-              <Link
-                className={styles.adminButton}
-                to="/admin/noticias/crear"
+            {deleteError && (
+              <p
+                className={styles.errorMessage}
+                role="alert"
               >
-                Crear noticia
-              </Link>
+                {deleteError}
+              </p>
             )}
-          </div>
 
-
-          <div className={styles.categoryFilters} aria-label="Filtrar noticias">
-            {newsCategories.map((category) => (
-              <button
-                type="button"
-                key={category}
-                className={`${styles.categoryButton} ${
-                  newsCategory === category
-                    ? styles.categoryButtonActive
-                    : ""
-                }`}
-                aria-pressed={newsCategory === category}
-                onClick={() => setNewsCategory(category)}
+            {loading ? (
+              <p
+                className={styles.loadingState}
+                role="status"
               >
-                {category}
-              </button>
-            ))}
-          </div>
-
-
-          {loading ? (
-            <p className={styles.loadingState}>Cargando noticias...</p>
-          ) : filteredNews.length === 0 ? (
-            <div className={styles.emptyState}>
-              <h3>No hay noticias para mostrar</h3>
-              <p>
-                Prueba con otra categoría o vuelve más tarde para consultar
-                nuevas publicaciones.
+                Cargando noticias...
               </p>
-            </div>
-          ) : (
-            <>
-              {featuredNews && (
-                <ScrollReveal>
-                  <article className={styles.featuredCard}>
-                    <div className={styles.featuredVisual}>
-                      <NewsImage item={featuredNews} featured />
-                      <span className={styles.featuredLabel}>Destacado</span>
-                    </div>
+            ) : newsError ? (
+              <div
+                className={styles.emptyState}
+                role="alert"
+              >
+                <h3>No pudimos cargar las noticias</h3>
+                <p>{newsError}</p>
 
+                <button
+                  type="button"
+                  className={styles.secondaryAction}
+                  onClick={() =>
+                    setNewsReloadKey((value) => value + 1)
+                  }
+                >
+                  <RefreshCw size={16} aria-hidden="true" />
+                  Reintentar
+                </button>
+              </div>
+            ) : filteredNews.length === 0 ? (
+              <div className={styles.emptyState}>
+                <h3>No hay noticias en esta categoría</h3>
+                <p>
+                  Prueba con otra categoría o vuelve más tarde.
+                </p>
+              </div>
+            ) : (
+              <>
+                {featuredNews && (
+                  <ScrollReveal>
+                    <NewsCard
+                      item={featuredNews}
+                      featured
+                      canEdit={canEditNews}
+                      canDelete={canDeleteNews}
+                      deletingId={deletingId}
+                      onDelete={handleDelete}
+                    />
+                  </ScrollReveal>
+                )}
 
-                    <div className={styles.featuredContent}>
-                      <div className={styles.meta}>
-                        <span className={styles.metaCategory}>
-                          {getNewsCategory(featuredNews)}
-                        </span>
-                        <span>
-                          {formatDate(
-                            featuredNews.published_at ||
-                              featuredNews.created_at ||
-                              featuredNews.fecha_publicacion
-                          )}
-                        </span>
+                {remainingNews.length > 0 && (
+                  <>
+                    <div className={styles.sectionHeading}>
+                      <div>
+                        <h2 className={styles.sectionTitle}>
+                          Más noticias
+                        </h2>
+
+                        <p className={styles.sectionDescription}>
+                          Sigue explorando la actualidad de GENSTI.
+                        </p>
                       </div>
-
-
-                      <h2 className={styles.featuredTitle}>
-                        {getNewsTitle(featuredNews)}
-                      </h2>
-
-
-                      <p className={styles.featuredSummary}>
-                        {getNewsSummary(featuredNews)}
-                      </p>
-
-
-                      <Link
-                        className={styles.textLink}
-                        to={`/noticias/${getNewsId(featuredNews)}`}
-                      >
-                        Leer noticia <span aria-hidden="true">→</span>
-                      </Link>
-
-
-                      <AdminActions
-                        item={featuredNews}
-                        canEdit={canEdit}
-                        canDelete={canDelete}
-                        deletingId={deletingId}
-                        onDelete={handleDelete}
-                      />
                     </div>
-                  </article>
-                </ScrollReveal>
-              )}
 
-
-              {remainingNews.length > 0 && (
-                <>
-                  <div className={styles.sectionHeading}>
-                    <div>
-                      <h2 className={styles.sectionTitle}>Más noticias</h2>
-                      <p className={styles.sectionDescription}>
-                        Otras publicaciones de la comunidad.
-                      </p>
+                    <div className={styles.newsGrid}>
+                      {remainingNews.map((item) => (
+                        <ScrollReveal key={getNewsId(item)}>
+                          <NewsCard
+                            item={item}
+                            canEdit={canEditNews}
+                            canDelete={canDeleteNews}
+                            deletingId={deletingId}
+                            onDelete={handleDelete}
+                          />
+                        </ScrollReveal>
+                      ))}
                     </div>
-                  </div>
+                  </>
+                )}
+              </>
+            )}
+          </section>
+        )}
 
+        {/* OPORTUNIDADES */}
 
-                  <div className={styles.newsGrid}>
-                    {remainingNews.map((item) => (
-                      <ScrollReveal key={getNewsId(item)}>
-                        <article className={styles.newsCard}>
-                          <div className={styles.cardVisual}>
-                            <NewsImage item={item} />
-                          </div>
+        {activeSection === "opportunities" && (
+          <section aria-labelledby="opportunities-section-title">
+            <div className={styles.opportunitiesIntro}>
+              <div className={styles.opportunitiesIntroText}>
+                <p className={styles.eyebrow}>
+                  Da el siguiente paso
+                </p>
 
+                <h2
+                  id="opportunities-section-title"
+                  className={styles.sectionTitle}
+                >
+                  Oportunidades para crecer
+                </h2>
 
-                          <div className={styles.cardContent}>
-                            <div className={styles.meta}>
-                              <span className={styles.metaCategory}>
-                                {getNewsCategory(item)}
-                              </span>
-                              <span>
-                                {formatDate(
-                                  item.published_at ||
-                                    item.created_at ||
-                                    item.fecha_publicacion
-                                )}
-                              </span>
-                            </div>
+                <p className={styles.sectionDescription}>
+                  Becas, prácticas, empleos, convocatorias, talleres
+                  y actividades académicas compartidas por la comunidad.
+                </p>
+              </div>
 
-
-                            <h3 className={styles.cardTitle}>
-                              {getNewsTitle(item)}
-                            </h3>
-
-
-                            <p className={styles.cardSummary}>
-                              {getNewsSummary(item)}
-                            </p>
-
-
-                            <Link
-                              className={styles.textLink}
-                              to={`/noticias/${getNewsId(item)}`}
-                            >
-                              Leer noticia <span aria-hidden="true">→</span>
-                            </Link>
-
-
-                            <AdminActions
-                              item={item}
-                              canEdit={canEdit}
-                              canDelete={canDelete}
-                              deletingId={deletingId}
-                              onDelete={handleDelete}
-                            />
-                          </div>
-                        </article>
-                      </ScrollReveal>
-                    ))}
-                  </div>
-                </>
-              )}
-            </>
-          )}
-        </section>
-      )}
-
-
-      {activeSection === "community" && (
-        <section aria-label="Publicaciones de la comunidad">
-          <div className={styles.sectionHeading}>
-            <div>
-              <h2 className={styles.sectionTitle}>
-                Publicaciones de la comunidad
-              </h2>
-
-
-              <p className={styles.sectionDescription}>
-                Convocatorias, logros, actividades y oportunidades compartidas
-                por estudiantes de Ingeniería de Sistemas.
-              </p>
-            </div>
-
-
-            <div className={styles.adminActions}>
               {canCreateCommunityPost && (
                 <Link
-                  className={styles.adminButton}
                   to="/comunidad/publicaciones"
+                  className={styles.primaryAction}
                 >
+                  <Plus size={18} aria-hidden="true" />
+                  Compartir oportunidad
+                </Link>
+              )}
+            </div>
+
+            <div
+              className={styles.categoryFilters}
+              role="group"
+              aria-label="Filtrar oportunidades"
+            >
+              {opportunityCategories.map((category) => (
+                <button
+                  type="button"
+                  key={category}
+                  className={`${styles.categoryButton} ${
+                    opportunityCategory === category
+                      ? styles.categoryButtonActive
+                      : ""
+                  }`}
+                  aria-pressed={
+                    opportunityCategory === category
+                  }
+                  onClick={() =>
+                    setOpportunityCategory(category)
+                  }
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+
+            {opportunityLoading ? (
+              <p
+                className={styles.loadingState}
+                role="status"
+              >
+                Cargando oportunidades...
+              </p>
+            ) : opportunityError ? (
+              <div
+                className={styles.emptyState}
+                role="alert"
+              >
+                <h3>No pudimos cargar las oportunidades</h3>
+                <p>{opportunityError}</p>
+
+                <button
+                  type="button"
+                  className={styles.secondaryAction}
+                  onClick={() =>
+                    setOpportunityReloadKey(
+                      (value) => value + 1
+                    )
+                  }
+                >
+                  <RefreshCw size={16} aria-hidden="true" />
+                  Reintentar
+                </button>
+              </div>
+            ) : filteredOpportunities.length === 0 ? (
+              <div className={styles.emptyState}>
+                <h3>
+                  No hay oportunidades en esta categoría
+                </h3>
+
+                <p>
+                  Cuando el equipo de moderación apruebe
+                  convocatorias, aparecerán aquí.
+                </p>
+
+                {canCreateCommunityPost && (
+                  <Link
+                    to="/comunidad/publicaciones"
+                    className={styles.primaryAction}
+                  >
+                    <Plus size={18} aria-hidden="true" />
+                    Compartir una oportunidad
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <>
+                <div className={styles.sectionHeading}>
+                  <div>
+                    <h3 className={styles.sectionTitle}>
+                      {filteredOpportunities.length}{" "}
+                      {filteredOpportunities.length === 1
+                        ? "oportunidad disponible"
+                        : "oportunidades disponibles"}
+                    </h3>
+
+                    <p className={styles.sectionDescription}>
+                      Revisa la información y confirma siempre
+                      los datos con la fuente oficial.
+                    </p>
+                  </div>
+                </div>
+
+                <div className={styles.newsGrid}>
+                  {filteredOpportunities.map((item) => (
+                    <ScrollReveal key={item.id}>
+                      <CommunityPostCard
+                        item={item}
+                        variant="opportunities"
+                      />
+                    </ScrollReveal>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
+        )}
+
+        {/* COMUNIDAD */}
+
+        {activeSection === "community" && (
+          <section aria-labelledby="community-section-title">
+            <div className={styles.sectionHeading}>
+              <div>
+                <h2
+                  id="community-section-title"
+                  className={styles.sectionTitle}
+                >
+                  Lo que comparte nuestra comunidad
+                </h2>
+
+                <p className={styles.sectionDescription}>
+                  Iniciativas, experiencias y publicaciones
+                  aprobadas por el equipo de moderación.
+                </p>
+              </div>
+
+              {canCreateCommunityPost && (
+                <Link
+                  to="/comunidad/publicaciones"
+                  className={styles.primaryAction}
+                >
+                  <Plus size={18} aria-hidden="true" />
                   Crear publicación
                 </Link>
               )}
-
-
-              {canModerateCommunityPosts && (
-                <Link
-                  className={styles.adminButton}
-                  to="/admin/comunidad/publicaciones"
-                >
-                  Moderar publicaciones
-                </Link>
-              )}
             </div>
-          </div>
 
-
-          {communityLoading ? (
-            <p className={styles.loadingState}>
-              Cargando publicaciones...
-            </p>
-          ) : communityPosts.length === 0 ? (
-            <div className={styles.emptyState}>
-              <h3>No hay publicaciones publicadas</h3>
-              <p>
-                Cuando el equipo de moderación apruebe publicaciones,
-                aparecerán aquí.
-              </p>
-            </div>
-          ) : (
-            <div className={styles.newsGrid}>
-              {communityPosts.map((post) => (
-                <ScrollReveal key={post.id}>
-                  <article className={styles.newsCard}>
-                    <div className={styles.cardContent}>
-                      <div className={styles.meta}>
-                        <span className={styles.metaCategory}>
-                          {post.category}
-                        </span>
-
-
-                        <span>
-                          {formatDate(post.created_at)}
-                        </span>
-                      </div>
-
-
-                      <h3 className={styles.cardTitle}>
-                        {post.title}
-                      </h3>
-
-
-                      <p className={styles.cardSummary}>
-                        {post.content}
-                      </p>
-                    </div>
-                  </article>
-                </ScrollReveal>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
-
-
-      {activeSection === "opportunities" && (
-        <section aria-label="Oportunidades y convocatorias">
-          <div className={styles.opportunitiesIntro}>
-            <div className={styles.opportunitiesIntroText}>
-              <p className={styles.eyebrow}>Da el siguiente paso</p>
-              <h2 className={styles.sectionTitle}>
-                Oportunidades para crecer
-              </h2>
-              <p className={styles.sectionDescription}>
-                Explora ejemplos de prácticas, becas, convocatorias, talleres y
-                actividades académicas que podrían interesarte.
-              </p>
-            </div>
-          </div>
-
-
-          <p className={styles.opportunitiesNotice}>
-            <strong>Contenido de demostración:</strong> estas oportunidades son
-            ficticias y se muestran para probar la interfaz. Verifica siempre
-            la información oficial antes de tomar decisiones o compartir
-            documentos.
-          </p>
-
-
-          <div
-            className={styles.categoryFilters}
-            aria-label="Filtrar oportunidades"
-          >
-            {opportunityCategories.map((category) => (
-              <button
-                type="button"
-                key={category}
-                className={`${styles.categoryButton} ${
-                  opportunityCategory === category
-                    ? styles.categoryButtonActive
-                    : ""
-                }`}
-                aria-pressed={opportunityCategory === category}
-                onClick={() => setOpportunityCategory(category)}
+            {communityLoading ? (
+              <p
+                className={styles.loadingState}
+                role="status"
               >
-                {category}
-              </button>
-            ))}
-          </div>
-
-
-          <div className={styles.sectionHeading}>
-            <div>
-              <h3 className={styles.sectionTitle}>
-                {filteredOpportunities.length}{" "}
-                {filteredOpportunities.length === 1
-                  ? "oportunidad disponible"
-                  : "oportunidades disponibles"}
-              </h3>
-              <p className={styles.sectionDescription}>
-                Selecciona una tarjeta para consultar sus requisitos.
+                Cargando publicaciones...
               </p>
-            </div>
-          </div>
+            ) : communityError ? (
+              <div
+                className={styles.emptyState}
+                role="alert"
+              >
+                <h3>No pudimos cargar las publicaciones</h3>
+                <p>{communityError}</p>
 
+                <button
+                  type="button"
+                  className={styles.secondaryAction}
+                  onClick={() =>
+                    setCommunityReloadKey(
+                      (value) => value + 1
+                    )
+                  }
+                >
+                  <RefreshCw size={16} aria-hidden="true" />
+                  Reintentar
+                </button>
+              </div>
+            ) : sortedCommunityPosts.length === 0 ? (
+              <div className={styles.emptyState}>
+                <h3>Todavía no hay publicaciones aprobadas</h3>
 
-          {filteredOpportunities.length === 0 ? (
-            <div className={styles.emptyState}>
-              <h3>No hay oportunidades en esta categoría</h3>
-              <p>Prueba con otra categoría para explorar más opciones.</p>
-            </div>
-          ) : (
-            <div className={styles.opportunitiesGrid}>
-              {filteredOpportunities.map((opportunity) => (
-                <ScrollReveal key={opportunity.id}>
-                  <article className={styles.opportunityCard}>
-                    <div className={styles.opportunityTop}>
-                      <span className={styles.opportunityType}>
-                        {opportunity.category}
-                      </span>
-                      <span className={styles.opportunityStatus}>
-                        <span className={styles.statusDot} />
-                        {opportunity.status}
-                      </span>
-                    </div>
+                <p>
+                  Cuando el equipo de moderación apruebe
+                  contenido, aparecerá en esta sección.
+                </p>
 
-
-                    <h3 className={styles.opportunityTitle}>
-                      {opportunity.title}
-                    </h3>
-
-
-                    <p className={styles.opportunityDescription}>
-                      {opportunity.description}
-                    </p>
-
-
-                    <div className={styles.opportunityMeta}>
-                      <span>
-                        <strong>Tipo:</strong> {opportunity.type}
-                      </span>
-                      <span>
-                        <strong>Modalidad:</strong> {opportunity.modality}
-                      </span>
-                      <span>
-                        <strong>Fecha de referencia:</strong>{" "}
-                        {formatDate(opportunity.deadline)}
-                      </span>
-                    </div>
-
-
-                    <details className={styles.opportunityDetails}>
-                      <summary className={styles.detailsSummary}>
-                        Consultar requisitos
-                      </summary>
-                      <div className={styles.expandedDetails}>
-                        <ul>
-                          {opportunity.requirements.map((requirement) => (
-                            <li key={requirement}>{requirement}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </details>
-
-
-                    <p className={styles.demoCaption}>
-                      Ejemplo de interfaz. No es una convocatoria oficial.
-                    </p>
-                  </article>
-                </ScrollReveal>
-              ))}
-            </div>
-          )}
-        </section>
-      )}
-    </main>
+                {canCreateCommunityPost && (
+                  <Link
+                    to="/comunidad/publicaciones"
+                    className={styles.primaryAction}
+                  >
+                    <Plus size={18} aria-hidden="true" />
+                    Crear la primera publicación
+                  </Link>
+                )}
+              </div>
+            ) : (
+              <div className={styles.newsGrid}>
+                {sortedCommunityPosts.map((item) => (
+                  <ScrollReveal key={item.id}>
+                    <CommunityPostCard
+                      item={item}
+                      variant="community"
+                    />
+                  </ScrollReveal>
+                ))}
+              </div>
+            )}
+          </section>
+        )}
+      </div>
+    </section>
   );
 }

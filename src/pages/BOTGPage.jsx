@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import styles from "../styles/BestOfGensTI.module.css";
 
 /* ==========================================
-   CATEGORÍAS
+   CATEGORÍAS Y ADAPTACIÓN DE DATOS
 ========================================== */
 
 const categories = [
@@ -13,78 +13,32 @@ const categories = [
   { id: "excelencia", label: "Excelencia académica" },
 ];
 
-/* ==========================================
-   RECONOCIMIENTOS — CONTENIDO DE DEMOSTRACIÓN
-========================================== */
+const CATEGORY_LABELS = {
+  semilleros: "INVESTIGACIÓN",
+  "saber-pro": "SABER PRO",
+  proyectos: "INNOVACIÓN",
+  excelencia: "EXCELENCIA ACADÉMICA",
+};
 
-const recognitions = [
-  {
-    id: 1,
-    category: "semilleros",
-    categoryLabel: "INVESTIGACIÓN",
-    title: "Ideas que se convierten en soluciones",
-    description:
-      "Un espacio para destacar las iniciativas de investigación, innovación y desarrollo creadas por los semilleros de Ingeniería de Sistemas.",
-    period: "Reconocimientos por convocatoria",
-    image:
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1400&q=85",
-    imagePosition: "center",
-    featured: true,
-  },
-  {
-    id: 2,
-    category: "saber-pro",
-    categoryLabel: "SABER PRO",
-    title: "El conocimiento también deja huella",
-    description:
-      "Un espacio destinado a reconocer resultados sobresalientes en las pruebas Saber Pro, una vez hayan sido verificados con información autorizada.",
-    period: "Resultados oficiales por confirmar",
-    image:
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=85",
-    imagePosition: "center",
-  },
-  {
-    id: 3,
-    category: "proyectos",
-    categoryLabel: "INNOVACIÓN",
-    title: "Proyectos con propósito",
-    description:
-      "Aplicaciones, prototipos e ideas que utilizan la tecnología para responder a necesidades reales de las personas y las organizaciones.",
-    period: "Convocatorias y proyectos destacados",
-    image:
-      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1200&q=85",
-    imagePosition: "center",
-  },
-  {
-    id: 4,
-    category: "excelencia",
-    categoryLabel: "EXCELENCIA",
-    title: "La constancia también merece reconocimiento",
-    description:
-      "Una futura sección para destacar la excelencia académica por periodos, con criterios transparentes y datos validados por la universidad.",
-    period: "Información académica por confirmar",
-    image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=85",
-    imagePosition: "center",
-  },
-];
-
-/* ==========================================
-   GALERÍA IMA-GENSTI
-========================================== */
-
-const imaGallery = recognitions.map((item, index) => ({
-  id: `ima-${item.id}`,
-  image: item.image,
-  imagePosition: item.imagePosition,
-  imageAlt: `Imagen de demostración ${index + 1} para la galería de IMA-GensTI`,
-  categoryLabel: "IMA-GENSTI",
-  title: `Galería IMA-GensTI · Vista ${index + 1}`,
-  description:
-    "Vista previa del diseño de la galería. Esta imagen de demostración será reemplazada por una fotografía autorizada del evento IMA-GensTI.",
-  period: "Imagen de demostración · No corresponde al evento",
-  isGallery: true,
-}));
+function normalizeEntry(entry) {
+  return {
+    id: entry.id,
+    category: entry.category,
+    categoryLabel:
+      entry.content_type === "gallery"
+        ? "IMA-GENSTI"
+        : CATEGORY_LABELS[entry.category] ?? "RECONOCIMIENTO",
+    studentName: entry.student_name ?? "",
+    title: entry.title,
+    description: entry.description,
+    period: entry.period ?? "",
+    image: entry.image_url,
+    imageAlt: entry.image_alt ?? "",
+    imagePosition: entry.image_position ?? "center",
+    featured: Boolean(entry.featured),
+    isGallery: entry.content_type === "gallery",
+  };
+}
 
 /* ==========================================
    ENTRADAS Y SALIDAS AL HACER SCROLL
@@ -265,14 +219,14 @@ function RecognitionModal({ item, onClose }) {
       if (
         event.shiftKey &&
         (document.activeElement === firstElement ||
-          !modal.contains(document.activeElement))
+          !modal?.contains(document.activeElement))
       ) {
         event.preventDefault();
         lastElement.focus();
       } else if (
         !event.shiftKey &&
         (document.activeElement === lastElement ||
-          !modal.contains(document.activeElement))
+          !modal?.contains(document.activeElement))
       ) {
         event.preventDefault();
         firstElement.focus();
@@ -331,16 +285,18 @@ function RecognitionModal({ item, onClose }) {
           ×
         </button>
 
-        <div className={styles.modalImageWrap}>
-          <img
-            src={item.image}
-            alt={item.imageAlt ?? ""}
-            className={styles.modalImage}
-            style={{
-              objectPosition: item.imagePosition ?? "center",
-            }}
-          />
-        </div>
+        {item.image && (
+          <div className={styles.modalImageWrap}>
+            <img
+              src={item.image}
+              alt={item.imageAlt}
+              className={styles.modalImage}
+              style={{
+                objectPosition: item.imagePosition,
+              }}
+            />
+          </div>
+        )}
 
         <div className={styles.modalContent}>
           <span className={styles.sectionIndex}>
@@ -349,19 +305,21 @@ function RecognitionModal({ item, onClose }) {
 
           <h2 id="tbog-modal-title">{item.title}</h2>
 
+          {item.studentName && (
+            <p className={styles.studentName}>
+              {item.studentName}
+            </p>
+          )}
+
           <p id="tbog-modal-description">
             {item.description}
           </p>
 
-          <span className={styles.modalPeriod}>
-            {item.period}
-          </span>
-
-          <p className={styles.modalNotice}>
-            {item.isGallery
-              ? "Esta fotografía es de demostración y no corresponde al evento IMA-GensTI. Será reemplazada por material autorizado."
-              : "Esta sección es una vista de demostración. Los nombres, resultados y reconocimientos reales se publicarán cuando la información esté verificada y autorizada."}
-          </p>
+          {item.period && (
+            <span className={styles.modalPeriod}>
+              {item.period}
+            </span>
+          )}
 
           <button
             type="button"
@@ -385,7 +343,71 @@ function BOTGPage() {
   const [activeCategory, setActiveCategory] = useState("todos");
   const [selectedItem, setSelectedItem] = useState(null);
 
-  const sectionRef = useRevealOnScroll(activeCategory);
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    async function loadEntries() {
+      setLoading(true);
+      setLoadError("");
+
+      try {
+        const response = await fetch("/tbog/entries", {
+          signal: controller.signal,
+          credentials: "include",
+          cache: "no-store",
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            `No fue posible cargar TBOG (${response.status}).`
+          );
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error(
+            "La API devolvió un formato de contenido inesperado."
+          );
+        }
+
+        if (controller.signal.aborted) return;
+
+        setEntries(data.map(normalizeEntry));
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          setLoadError(
+            error.message || "No fue posible cargar TBOG."
+          );
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadEntries();
+
+    return () => controller.abort();
+  }, [reloadKey]);
+
+  const recognitions = entries.filter(
+    (item) => !item.isGallery
+  );
+
+  const imaGallery = entries.filter(
+    (item) => item.isGallery
+  );
+
+  const featuredItems = recognitions.filter(
+    (item) => item.featured
+  );
 
   const visibleItems =
     activeCategory === "todos"
@@ -395,11 +417,18 @@ function BOTGPage() {
         );
 
   const activeCategoryLabel =
-    categories.find((item) => item.id === activeCategory)?.label ??
-    "Todo lo destacado";
+    categories.find(
+      (item) => item.id === activeCategory
+    )?.label ?? "Todo lo destacado";
 
-  // La referencia permanece estable entre renders.
-  const closeModal = useRef(() => setSelectedItem(null)).current;
+  // También observa las tarjetas que aparecen al llegar los datos.
+  const sectionRef = useRevealOnScroll(
+    `${activeCategory}-${loading}-${reloadKey}`
+  );
+
+  const closeModal = useRef(
+    () => setSelectedItem(null)
+  ).current;
 
   function handleAnchorClick(event) {
     if (
@@ -437,15 +466,13 @@ function BOTGPage() {
 
   return (
     <>
-      <main
+      <div
         id="top"
         className={styles.page}
         ref={sectionRef}
         inert={selectedItem ? "" : undefined}
       >
-        {/* ==================================
-            HERO
-        ================================== */}
+        {/* HERO */}
 
         <section
           className={styles.hero}
@@ -605,9 +632,7 @@ function BOTGPage() {
           </a>
         </section>
 
-        {/* ==================================
-            INTRODUCCIÓN
-        ================================== */}
+        {/* INTRODUCCIÓN */}
 
         <section
           id="introduccion"
@@ -641,9 +666,7 @@ function BOTGPage() {
           </div>
         </section>
 
-        {/* ==================================
-            IMA-GENSTI
-        ================================== */}
+        {/* IMA-GENSTI */}
 
         <section
           id="ima-gensti"
@@ -684,7 +707,7 @@ function BOTGPage() {
             <p className={styles.imaDescription}>
               Un espacio para celebrar el talento, compartir
               experiencias y reconocer aquello que nos impulsa
-              a crecer como comunidad. Aquí podremos reunir los
+              a crecer como comunidad. Aquí reunimos los
               recuerdos y momentos destacados del evento IMA-GensTI.
             </p>
 
@@ -705,9 +728,29 @@ function BOTGPage() {
           </div>
         </section>
 
-        {/* ==================================
-            GALERÍA IMA-GENSTI
-        ================================== */}
+        {/* CARGA Y ERRORES */}
+
+        {loading && (
+          <div className={styles.contentState} role="status">
+            Cargando reconocimientos y fotografías...
+          </div>
+        )}
+
+        {!loading && loadError && (
+          <div className={styles.contentState} role="alert">
+            <p>{loadError}</p>
+
+            <button
+              type="button"
+              className={`${styles.button} ${styles.buttonOutline}`}
+              onClick={() => setReloadKey((value) => value + 1)}
+            >
+              Volver a intentar
+            </button>
+          </div>
+        )}
+
+        {/* GALERÍA IMA-GENSTI */}
 
         <section
           id="galeria-ima"
@@ -729,60 +772,62 @@ function BOTGPage() {
             </div>
 
             <p className={styles.headingDescription}>
-              Un espacio para reunir las fotografías y los
-              recuerdos del evento.
+              Las fotografías y los recuerdos que nos conectan
+              con los mejores momentos del evento.
             </p>
           </div>
 
           <div data-reveal>
-            <div className={styles.galleryStage}>
-              {imaGallery.map((photo, index) => (
-                <button
-                  key={photo.id}
-                  type="button"
-                  className={styles.galleryPhoto}
-                  style={{
-                    "--rotation": `${
-                      [-7, 4, -4, 7][index % 4]
-                    }deg`,
-                    "--float-delay": `${index * -1.3}s`,
-                  }}
-                  onClick={() => setSelectedItem(photo)}
-                  aria-label={`Abrir ${photo.title}. Imagen de demostración`}
-                  aria-haspopup="dialog"
-                >
-                  <span className={styles.galleryPhotoInner}>
-                    <img
-                      src={photo.image}
-                      alt={photo.imageAlt}
-                      loading="lazy"
-                      decoding="async"
-                      style={{
-                        objectPosition: photo.imagePosition,
-                      }}
-                    />
+            {imaGallery.length > 0 && (
+              <div className={styles.galleryStage}>
+                {imaGallery.map((photo, index) => (
+                  <button
+                    key={photo.id}
+                    type="button"
+                    className={styles.galleryPhoto}
+                    style={{
+                      "--rotation": `${
+                        [-7, 4, -4, 7][index % 4]
+                      }deg`,
+                      "--float-delay": `${index * -1.3}s`,
+                    }}
+                    onClick={() => setSelectedItem(photo)}
+                    aria-label={`Abrir ${photo.title}`}
+                    aria-haspopup="dialog"
+                  >
+                    <span className={styles.galleryPhotoInner}>
+                      <img
+                        src={photo.image}
+                        alt={photo.imageAlt}
+                        loading="lazy"
+                        decoding="async"
+                        style={{
+                          objectPosition: photo.imagePosition,
+                        }}
+                      />
 
-                    <span
-                      className={styles.galleryPhotoCaption}
-                    >
-                      <span>IMA-GensTI</span>
-                      <span aria-hidden="true">↗</span>
+                      <span
+                        className={styles.galleryPhotoCaption}
+                      >
+                        <span>{photo.title}</span>
+                        <span aria-hidden="true">↗</span>
+                      </span>
                     </span>
-                  </span>
-                </button>
-              ))}
-            </div>
+                  </button>
+                ))}
+              </div>
+            )}
 
-            <p className={styles.galleryNotice}>
-              Vista previa visual: las imágenes mostradas son
-              de demostración y no corresponden al evento.
-            </p>
+            {!loading && !loadError && imaGallery.length === 0 && (
+              <p className={styles.galleryNotice}>
+                Próximamente compartiremos las fotografías
+                de IMA-GensTI.
+              </p>
+            )}
           </div>
         </section>
 
-        {/* ==================================
-            HISTORIA DESTACADA
-        ================================== */}
+        {/* HISTORIAS DESTACADAS */}
 
         <section
           id="destacados"
@@ -809,71 +854,71 @@ function BOTGPage() {
           </div>
 
           <div className={styles.featuredGrid}>
-            {recognitions
-              .filter((item) => item.featured)
-              .map((item) => (
-                <article
-                  key={item.id}
-                  className={styles.featureCard}
-                  data-reveal
+            {featuredItems.map((item) => (
+              <article
+                key={item.id}
+                className={styles.featureCard}
+                data-reveal
+              >
+                <button
+                  type="button"
+                  className={styles.featureButton}
+                  onClick={() => setSelectedItem(item)}
+                  aria-label={`Ver detalles de ${item.title}`}
+                  aria-haspopup="dialog"
                 >
-                  <button
-                    type="button"
-                    className={styles.featureButton}
-                    onClick={() => setSelectedItem(item)}
-                    aria-label={`Ver detalles de ${item.title}`}
-                    aria-haspopup="dialog"
-                  >
-                    <img
-                      src={item.image}
-                      alt=""
-                      className={styles.featureImage}
-                      style={{
-                        objectPosition: item.imagePosition,
-                      }}
-                      loading="lazy"
-                      decoding="async"
-                    />
+                  <img
+                    src={item.image}
+                    alt=""
+                    className={styles.featureImage}
+                    style={{
+                      objectPosition: item.imagePosition,
+                    }}
+                    loading="lazy"
+                    decoding="async"
+                  />
 
-                    <span
-                      className={styles.featureShade}
-                      aria-hidden="true"
-                    />
+                  <span
+                    className={styles.featureShade}
+                    aria-hidden="true"
+                  />
 
-                    <span className={styles.featureTopline}>
-                      <span>{item.categoryLabel}</span>
-                      <span aria-hidden="true">↗</span>
+                  <span className={styles.featureTopline}>
+                    <span>{item.categoryLabel}</span>
+                    <span aria-hidden="true">↗</span>
+                  </span>
+
+                  <span className={styles.featureBody}>
+                    <span className={styles.featureTag}>
+                      {item.studentName || "RECONOCIMIENTO GENSTI"}
                     </span>
 
-                    <span className={styles.featureBody}>
-                      <span className={styles.featureTag}>
-                        ESPACIO DE RECONOCIMIENTO
-                      </span>
-
-                      <span className={styles.featureTitle}>
-                        {item.title}
-                      </span>
-
-                      <span
-                        className={styles.featureDescription}
-                      >
-                        {item.description}
-                      </span>
-
-                      <span className={styles.featureLink}>
-                        Explorar historia
-                        <span aria-hidden="true">→</span>
-                      </span>
+                    <span className={styles.featureTitle}>
+                      {item.title}
                     </span>
-                  </button>
-                </article>
-              ))}
+
+                    <span className={styles.featureDescription}>
+                      {item.description}
+                    </span>
+
+                    <span className={styles.featureLink}>
+                      Explorar historia
+                      <span aria-hidden="true">→</span>
+                    </span>
+                  </span>
+                </button>
+              </article>
+            ))}
           </div>
+
+          {!loading && !loadError && featuredItems.length === 0 && (
+            <p className={styles.contentState}>
+              Pronto conocerás nuevas historias destacadas.
+            </p>
+          )}
         </section>
 
-        {/* ==================================
-            CATEGORÍAS Y TARJETAS
-        ================================== */}
+        {/* CATEGORÍAS Y TARJETAS */}
 
         <section
           className={styles.categories}
@@ -935,14 +980,29 @@ function BOTGPage() {
             <span>{activeCategoryLabel.toUpperCase()}</span>
 
             <span>
-              {visibleItems.length}{" "}
-              {visibleItems.length === 1
-                ? "HISTORIA"
-                : "HISTORIAS"}
+              {loading
+                ? "CARGANDO..."
+                : loadError
+                ? "CONTENIDO NO DISPONIBLE"
+                : `${visibleItems.length} ${
+                    visibleItems.length === 1
+                      ? "HISTORIA"
+                      : "HISTORIAS"
+                  }`}
             </span>
           </div>
 
-          <div id="tbog-recognition-results">
+          <div
+            id="tbog-recognition-results"
+            aria-busy={loading}
+          >
+            {!loading && !loadError && visibleItems.length === 0 && (
+              <p className={styles.contentState}>
+                Todavía no hay reconocimientos publicados
+                en esta categoría.
+              </p>
+            )}
+
             <div
               className={styles.cardGrid}
               key={activeCategory}
@@ -993,17 +1053,23 @@ function BOTGPage() {
                     </span>
 
                     <span className={styles.cardContent}>
-                      <span className={styles.cardPeriod}>
-                        {item.period}
-                      </span>
+                      {item.period && (
+                        <span className={styles.cardPeriod}>
+                          {item.period}
+                        </span>
+                      )}
 
                       <span className={styles.cardTitle}>
                         {item.title}
                       </span>
 
-                      <span
-                        className={styles.cardDescription}
-                      >
+                      {item.studentName && (
+                        <span className={styles.studentName}>
+                          {item.studentName}
+                        </span>
+                      )}
+
+                      <span className={styles.cardDescription}>
                         {item.description}
                       </span>
 
@@ -1019,9 +1085,7 @@ function BOTGPage() {
           </div>
         </section>
 
-        {/* ==================================
-            MANIFIESTO
-        ================================== */}
+        {/* MANIFIESTO */}
 
         <section
           className={styles.manifesto}
@@ -1060,9 +1124,7 @@ function BOTGPage() {
           </a>
         </section>
 
-        {/* ==================================
-            FOOTER
-        ================================== */}
+        {/* FOOTER DE TBOG */}
 
         <footer className={styles.footer}>
           <div className={styles.footerBrand}>
@@ -1073,7 +1135,7 @@ function BOTGPage() {
               {"</>"}
             </span>
 
-            <strong>GENSTI</strong>
+            <strong>GensTI</strong>
             <span>Ingeniería de Sistemas</span>
           </div>
 
@@ -1083,10 +1145,9 @@ function BOTGPage() {
             Volver arriba ↑
           </a>
         </footer>
-      </main>
+      </div>
 
-      {/* El modal queda fuera del contenido inactivo.
-          El contenedor conserva las variables del CSS Module. */}
+      {/* El modal queda fuera del contenido inactivo. */}
 
       {selectedItem && (
         <div className={styles.page}>
