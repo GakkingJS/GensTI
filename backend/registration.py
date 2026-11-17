@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from email_verification import create_verification_token
-from models import User
+from models import Role, User, UserRole
 from passwords import hash_password
 
 
@@ -60,6 +60,20 @@ def register_user(
 
     db.add(user)
     db.flush()
+
+    student_role = db.scalar(
+        select(Role).where(Role.name == "student")
+    )
+
+    if student_role is None:
+        raise ValueError("El rol 'student' no existe")
+
+    db.add(
+        UserRole(
+            user_id=user.id,
+            role_id=student_role.id,
+        )
+    )
 
     token = create_verification_token(db, user)
 

@@ -56,3 +56,12 @@ docker-data/
 cookies.txt
 backend/promote_superadmin.py
 
+certbot/
+certbot/**certbot/
+certbot/**
+.env
+.env.*
+*.pem
+*.key
+secrets/
+secrets/**

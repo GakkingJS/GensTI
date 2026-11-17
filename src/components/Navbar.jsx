@@ -69,7 +69,7 @@ function Navbar() {
   const userRef = useRef(null);
 
   const isStudent = hasRole("student");
-  const canViewNews = isStudent || hasRole("admin");
+  const canViewNews = hasPermission("news.view");
   const canManageUsers = hasPermission("users.manage");
 
   useEffect(() => {
