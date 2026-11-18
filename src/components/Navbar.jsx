@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import gensstiLogo from "../assets/genssti-logo.jpg";
+
 
 function Dropdown({ label, items, onNavigate }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const location = useLocation();
   const isActive = items.some((i) => location.pathname.startsWith(i.to));
+
 
   useEffect(() => {
     function close(e) {
@@ -23,9 +26,12 @@ function Dropdown({ label, items, onNavigate }) {
     };
   }, []);
 
+
   useEffect(() => setOpen(false), [location.pathname]);
 
+
   if (items.length === 0) return null;
+
 
   return (
     <div className={`navbar-dropdown ${open ? "is-open" : ""}`} ref={ref}>
@@ -37,6 +43,7 @@ function Dropdown({ label, items, onNavigate }) {
       >
         {label} <span className="caret" aria-hidden="true">▾</span>
       </button>
+
 
       <div className="navbar-dropdown-panel" role="menu">
         {items.map((i, idx) => (
@@ -58,24 +65,29 @@ function Dropdown({ label, items, onNavigate }) {
   );
 }
 
+
 function Navbar() {
   const { user, loading, logout, hasRole, hasPermission } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const userRef = useRef(null);
 
+
   const isStudent = hasRole("student");
   const canViewNews = hasPermission("news.view");
   const canManageUsers = hasPermission("users.manage");
+
 
   useEffect(() => {
     setMenuOpen(false);
     setUserOpen(false);
   }, [location.pathname]);
+
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -84,12 +96,14 @@ function Navbar() {
     };
   }, [menuOpen]);
 
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
 
   useEffect(() => {
     function close(e) {
@@ -101,10 +115,12 @@ function Navbar() {
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
+
   async function handleLogout() {
     await logout();
     navigate("/login", { replace: true });
   }
+
 
   function goToHome() {
     setMenuOpen(false);
@@ -115,34 +131,46 @@ function Navbar() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+
   const userInitial =
     user?.name?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? "U";
   const firstName = (user?.name ?? user?.email ?? "Usuario").split(/[\s@]/)[0];
+
 
   const communityItems = [
     { to: "/eventos", label: "Eventos" },
     { to: "/directorio", label: "Directorio" },
   ];
 
+
   const learnItems = [
     { to: "/academico", label: "Académico" },
     ...(isStudent ? [{ to: "/recursos", label: "Recursos" }] : []),
   ];
 
+
   const closeMenu = () => setMenuOpen(false);
   const linkClass = ({ isActive }) =>
     `navbar-link ${isActive ? "is-active" : ""}`;
+
 
   return (
     <header className={`navbar ${scrolled ? "is-scrolled" : ""}`}>
       <div className="navbar-inner">
         <Link to="/" className="logo" onClick={closeMenu}>
-          <span className="logo-mark" aria-hidden="true">{"</>"}</span>
+          <img
+            src={gensstiLogo}
+            alt="Logo de GensTI"
+            className="logo-image"
+          />
+
+
           <div className="logo-text">
             <strong>GensTI</strong>
             <small>Ingeniería de Sistemas</small>
           </div>
         </Link>
+
 
         <nav
           id="navbar-mobile-menu"
@@ -157,6 +185,7 @@ function Navbar() {
             Inicio
           </button>
 
+
           <Link
             to="/botg"
             title="The Best of GensTI"
@@ -167,20 +196,24 @@ function Navbar() {
             TBOG
           </Link>
 
+
           {canViewNews && (
             <NavLink to="/noticias" className={linkClass} onClick={closeMenu}>
               Noticias
             </NavLink>
           )}
 
+
           <Dropdown label="Comunidad" items={communityItems} onNavigate={closeMenu} />
           <Dropdown label="Aprender" items={learnItems} onNavigate={closeMenu} />
+
 
           {canManageUsers && (
             <NavLink to="/admin" className={linkClass} onClick={closeMenu}>
               Admin
             </NavLink>
           )}
+
 
           <Link
             to="/parche"
@@ -190,6 +223,7 @@ function Navbar() {
             <span aria-hidden="true">✦</span>
             Parche GensTI
           </Link>
+
 
           <div className="navbar-mobile-auth">
             {loading ? (
@@ -214,11 +248,13 @@ function Navbar() {
           </div>
         </nav>
 
+
         <div className="navbar-auth">
           <Link to="/parche" className="navbar-parche">
             <span aria-hidden="true">✦</span>
             Parche GensTI
           </Link>
+
 
           {loading ? (
             <span className="navbar-loading">Cargando...</span>
@@ -238,6 +274,7 @@ function Navbar() {
                 <span className="caret" aria-hidden="true">▾</span>
               </button>
 
+
               <div className="navbar-dropdown-panel navbar-user-panel">
                 <small className="navbar-user-email">{user.email}</small>
                 <button
@@ -255,6 +292,7 @@ function Navbar() {
           )}
         </div>
 
+
         <button
           type="button"
           className={`navbar-toggle ${menuOpen ? "is-open" : ""}`}
@@ -266,6 +304,7 @@ function Navbar() {
           <span /><span /><span />
         </button>
       </div>
+
 
       {menuOpen && <div className="navbar-overlay" onClick={closeMenu} />}
     </header>

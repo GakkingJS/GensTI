@@ -1,13 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap");
 
+
 /* ==========================================================================
    Login — GENSTI
-   Mantiene el diseño oscuro con las líneas flotantes. Cambios:
-   - Todo va bajo .login-page, así ningún estilo global (h1, p…) lo pisa.
-   - Botón propio de mostrar/ocultar contraseña.
-   - Marea en el botón, línea de agua en los campos y entrada escalonada,
-     igual que el resto de GENSTI.
    ========================================================================== */
+
 
 .login-page {
   --ink: #f4faf8;
@@ -29,9 +26,11 @@
   font-family: "DM Sans", sans-serif;
 }
 
+
 /* ==========================================================================
    Fondo
    ========================================================================== */
+
 
 .login-page .login-background {
   position: absolute;
@@ -40,10 +39,12 @@
   opacity: 0.58;
 }
 
+
 .login-page .login-background .floating-lines-container {
   width: 100%;
   height: 100%;
 }
+
 
 .login-page .login-overlay {
   position: absolute;
@@ -60,41 +61,80 @@
     );
 }
 
+
 /* ==========================================================================
-   Encabezado
+   Encabezado y logo
    ========================================================================== */
+
 
 .login-page .login-header {
   position: relative;
   z-index: 2;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 30px 48px;
+  padding: 24px 48px;
   animation: fade 0.9s ease-out backwards;
 }
 
+
 .login-page .brand {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   color: var(--ink);
   font-family: "Space Grotesk", sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
 }
+
+
+.login-page .brand-logo-frame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 7px;
+  background: rgba(4, 30, 38, 0.55);
+  border: 1px solid rgba(114, 185, 71, 0.22);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+}
+
 
 .login-page .brand-logo {
   display: block;
-  width: 190px;
-  height: auto;
-  object-fit: contain;
+  width: 16px !important;
+  height: 16px !important;
+  max-width: 16px !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.3));
 }
+
+
+.login-page .brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+
+.login-page .brand-text strong {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+
+.login-page .brand-text span {
+  font-size: 0.48rem;
+  color: rgba(244, 250, 248, 0.65);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
 
 /* ==========================================================================
    Contenido
    ========================================================================== */
+
 
 .login-page .login-content {
   position: relative;
@@ -109,20 +149,33 @@
   padding: 40px 48px 80px;
 }
 
+
 .login-page .login-introduction {
   max-width: 620px;
 }
 
-/* Entrada escalonada de la introducción y del panel */
+
 .login-page .eyebrow,
 .login-page .login-introduction h1,
 .login-page .introduction-text {
   animation: rise 0.8s var(--ease-out) backwards;
 }
 
-.login-page .eyebrow { animation-delay: 0.1s; }
-.login-page .login-introduction h1 { animation-delay: 0.2s; }
-.login-page .introduction-text { animation-delay: 0.35s; }
+
+.login-page .eyebrow {
+  animation-delay: 0.1s;
+}
+
+
+.login-page .login-introduction h1 {
+  animation-delay: 0.2s;
+}
+
+
+.login-page .introduction-text {
+  animation-delay: 0.35s;
+}
+
 
 .login-page .eyebrow {
   display: flex;
@@ -136,7 +189,7 @@
   text-transform: uppercase;
 }
 
-/* Punto vivo antes del texto */
+
 .login-page .eyebrow::before {
   content: "";
   flex-shrink: 0;
@@ -146,6 +199,7 @@
   background: var(--green);
   animation: ping 2.4s ease-out infinite;
 }
+
 
 .login-page .login-introduction h1 {
   margin: 0;
@@ -157,7 +211,7 @@
   line-height: 0.98;
 }
 
-/* La frase destacada se rellena con un agua que se mueve despacio */
+
 .login-page .login-introduction h1 span {
   color: var(--aqua);
   background: linear-gradient(
@@ -174,6 +228,7 @@
   animation: flow 10s linear infinite;
 }
 
+
 .login-page .introduction-text {
   max-width: 480px;
   margin: 30px 0 0;
@@ -182,16 +237,17 @@
   line-height: 1.7;
 }
 
+
 /* ==========================================================================
    Panel
    ========================================================================== */
+
 
 .login-page .login-panel {
   position: relative;
   width: 100%;
   padding: 42px;
   border: 1px solid rgba(184, 216, 210, 0.24);
-  /* Esquina inferior izquierda cerrada: firma visual de GENSTI */
   border-radius: 28px 28px 28px 8px;
   background: rgba(4, 42, 54, 0.82);
   box-shadow:
@@ -202,7 +258,7 @@
   animation: rise 0.9s var(--ease-out) 0.3s backwards;
 }
 
-/* Hilo de luz que recorre el borde superior */
+
 .login-page .login-panel::before {
   content: "";
   position: absolute;
@@ -217,9 +273,11 @@
   opacity: 0.9;
 }
 
+
 .login-page .login-panel-top {
   margin-bottom: 34px;
 }
+
 
 .login-page .login-label {
   margin: 0 0 12px;
@@ -228,6 +286,7 @@
   font-weight: 700;
   letter-spacing: 0.16em;
 }
+
 
 .login-page .login-panel h2 {
   margin: 0;
@@ -238,6 +297,7 @@
   letter-spacing: -0.035em;
 }
 
+
 .login-page .login-panel-top > p:last-child {
   margin: 10px 0 0;
   color: var(--muted);
@@ -245,9 +305,11 @@
   line-height: 1.6;
 }
 
+
 /* ==========================================================================
    Formulario
    ========================================================================== */
+
 
 .login-page .login-form {
   display: flex;
@@ -255,17 +317,20 @@
   gap: 23px;
 }
 
+
 .login-page .field {
   display: flex;
   flex-direction: column;
   gap: 9px;
 }
 
+
 .login-page .field label {
   color: rgba(244, 250, 248, 0.82);
   font-size: 12px;
   font-weight: 600;
 }
+
 
 .login-page .field input {
   width: 100%;
@@ -275,7 +340,6 @@
   border-bottom: 1px solid var(--line);
   outline: none;
   background-color: transparent;
-  /* Línea de agua que se dibuja de izquierda a derecha al enfocar */
   background-image: linear-gradient(90deg, var(--teal), var(--aqua), var(--green));
   background-repeat: no-repeat;
   background-position: 0 100%;
@@ -288,27 +352,31 @@
     background-size 0.55s var(--ease-out);
 }
 
+
 .login-page .field input::placeholder {
   color: rgba(184, 216, 210, 0.48);
 }
+
 
 .login-page .field input:focus {
   border-bottom-color: transparent;
   background-size: 100% 2px;
 }
 
-/* Autocompletado del navegador: sin el fondo claro que rompe el tema oscuro */
+
 .login-page .field input:-webkit-autofill {
   -webkit-text-fill-color: var(--ink);
   caret-color: var(--ink);
   transition: background-color 9999s ease-in-out 0s;
 }
 
+
 .login-page .field-label-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
 
 .login-page .forgot-password {
   position: relative;
@@ -321,6 +389,7 @@
   cursor: pointer;
   transition: color 0.2s ease;
 }
+
 
 .login-page .forgot-password::after {
   content: "";
@@ -335,14 +404,17 @@
   transition: transform 0.35s var(--ease-out);
 }
 
+
 .login-page .forgot-password:hover {
   color: #9bdb70;
 }
+
 
 .login-page .forgot-password:hover::after,
 .login-page .forgot-password:focus-visible::after {
   transform: scaleX(1);
 }
+
 
 .login-page .forgot-password:focus-visible {
   outline: 2px solid var(--green);
@@ -350,22 +422,23 @@
   border-radius: 3px;
 }
 
-/* ---------- Mostrar / ocultar contraseña ---------- */
 
-/* Oculta el ojito nativo de Edge: no se puede agrandar, así que usamos el nuestro */
 .login-page .field input[type="password"]::-ms-reveal,
 .login-page .field input[type="password"]::-ms-clear {
   display: none;
 }
 
+
 .login-page .password-input {
   position: relative;
 }
+
 
 .login-page .field .password-input input {
   min-height: 52px;
   padding-right: 56px;
 }
+
 
 .login-page .password-toggle {
   position: absolute;
@@ -373,7 +446,6 @@
   right: 0;
   display: grid;
   place-items: center;
-  /* Zona táctil de 44px: cómoda en celular */
   width: 44px;
   height: 44px;
   padding: 0;
@@ -389,31 +461,34 @@
     transform 0.35s var(--spring);
 }
 
+
 .login-page .password-toggle:hover {
   color: var(--aqua);
   background-color: rgba(0, 166, 166, 0.16);
 }
 
+
 .login-page .password-toggle:active {
   transform: translateY(-50%) scale(0.92);
 }
+
 
 .login-page .password-toggle:focus-visible {
   outline: 2px solid var(--green);
   outline-offset: 2px;
 }
 
-/* Contraseña visible: el ojo queda resaltado */
+
 .login-page .password-toggle[aria-pressed="true"] {
   color: var(--aqua);
   background-color: rgba(0, 166, 166, 0.2);
 }
 
+
 .login-page .password-toggle svg {
   animation: eye-swap 0.35s var(--spring);
 }
 
-/* ---------- Error ---------- */
 
 .login-page .login-error {
   padding: 12px 14px;
@@ -426,7 +501,6 @@
   animation: shake 0.5s ease-out;
 }
 
-/* ---------- Botón principal: el agua sube al pasar el cursor ---------- */
 
 .login-page .login-button {
   position: relative;
@@ -441,7 +515,6 @@
   border: 1px solid #36c6c6;
   border-radius: 14px 14px 14px 5px;
   background: #36c6c6;
-  /* Texto oscuro: con blanco sobre este aguamarina el contraste era bajo */
   color: #04303a;
   font-family: "Space Grotesk", sans-serif;
   font-size: 14px;
@@ -452,6 +525,7 @@
     box-shadow 0.3s ease;
 }
 
+
 .login-page .login-button::before {
   content: "";
   position: absolute;
@@ -460,34 +534,40 @@
   top: -30%;
   bottom: 0;
   z-index: -1;
-  border-radius: 50% 50% 0 0 / 28% 28%  0 0;
+  border-radius: 50% 50% 0 0 / 28% 28% 0 0;
   background: linear-gradient(135deg, var(--aqua), var(--green));
   transform: translateY(105%);
   transition: transform 0.65s var(--ease-out);
 }
+
 
 .login-page .login-button:hover:not(:disabled) {
   box-shadow: 0 14px 30px rgba(0, 166, 166, 0.3);
   transform: translateY(-2px);
 }
 
+
 .login-page .login-button:hover:not(:disabled)::before {
   transform: translateY(0);
 }
 
+
 .login-page .login-button:active:not(:disabled) {
   transform: translateY(0) scale(0.985);
 }
+
 
 .login-page .login-button:focus-visible {
   outline: 3px solid var(--green);
   outline-offset: 3px;
 }
 
+
 .login-page .login-button:disabled {
   cursor: not-allowed;
   opacity: 0.6;
 }
+
 
 .login-page .button-arrow {
   font-size: 20px;
@@ -495,11 +575,11 @@
   transition: transform 0.3s var(--ease-out);
 }
 
+
 .login-page .login-button:hover .button-arrow {
   transform: translateX(5px);
 }
 
-/* ---------- Registro ---------- */
 
 .login-page .register-prompt {
   display: flex;
@@ -510,7 +590,7 @@
   font-size: 12px;
 }
 
-/* El JSX usa <Link>, que es un <a>: antes quedaba con el estilo por defecto */
+
 .login-page .register-prompt a {
   position: relative;
   color: var(--green);
@@ -518,6 +598,7 @@
   text-decoration: none;
   transition: color 0.2s ease;
 }
+
 
 .login-page .register-prompt a::after {
   content: "";
@@ -532,13 +613,16 @@
   transition: transform 0.4s var(--ease-out);
 }
 
+
 .login-page .register-prompt a:hover {
   color: #9bdb70;
 }
 
+
 .login-page .register-prompt a:hover::after {
   transform: scaleX(1);
 }
+
 
 .login-page .register-prompt a:focus-visible {
   outline: 2px solid var(--green);
@@ -546,9 +630,11 @@
   border-radius: 3px;
 }
 
+
 /* ==========================================================================
    Footer
    ========================================================================== */
+
 
 .login-page .login-footer {
   position: absolute;
@@ -564,14 +650,17 @@
   animation: fade 1s ease-out 0.8s backwards;
 }
 
+
 .login-page .login-footer span:first-child {
   color: rgba(244, 250, 248, 0.82);
   font-weight: 700;
 }
 
+
 /* ==========================================================================
    Keyframes
    ========================================================================== */
+
 
 @keyframes rise {
   from {
@@ -580,11 +669,13 @@
   }
 }
 
+
 @keyframes fade {
   from {
     opacity: 0;
   }
 }
+
 
 @keyframes flow {
   to {
@@ -592,15 +683,18 @@
   }
 }
 
+
 @keyframes ping {
   0% {
     box-shadow: 0 0 0 0 rgba(114, 185, 71, 0.7);
   }
+
   80%,
   100% {
     box-shadow: 0 0 0 9px rgba(114, 185, 71, 0);
   }
 }
+
 
 @keyframes eye-swap {
   from {
@@ -609,32 +703,40 @@
   }
 }
 
+
 @keyframes shake {
   0% {
     opacity: 0;
     transform: translateX(0);
   }
+
   20% {
     opacity: 1;
     transform: translateX(-6px);
   }
+
   40% {
     transform: translateX(5px);
   }
+
   60% {
     transform: translateX(-3px);
   }
+
   80% {
     transform: translateX(2px);
   }
+
   100% {
     transform: translateX(0);
   }
 }
 
+
 /* ==========================================================================
    Responsive
    ========================================================================== */
+
 
 @media (max-width: 900px) {
   .login-page .login-content {
@@ -643,36 +745,44 @@
     padding-top: 30px;
   }
 
+
   .login-page .login-introduction {
     max-width: 650px;
   }
 
+
   .login-page .login-introduction h1 {
     font-size: clamp(42px, 9vw, 64px);
   }
+
 
   .login-page .login-panel {
     max-width: 500px;
   }
 }
 
+
 @media (max-width: 600px) {
   .login-page .login-header {
-    padding: 24px;
+    padding: 20px 24px;
   }
+
 
   .login-page .login-content {
     min-height: auto;
     padding: 40px 24px 100px;
   }
 
+
   .login-page .login-introduction h1 {
     font-size: 44px;
   }
 
+
   .login-page .login-panel {
     padding: 30px 24px;
   }
+
 
   .login-page .login-footer {
     right: 24px;
@@ -680,9 +790,6 @@
   }
 }
 
-/* ==========================================================================
-   Movimiento reducido
-   ========================================================================== */
 
 @media (prefers-reduced-motion: reduce) {
   .login-page *,
@@ -692,11 +799,12 @@
     transition-duration: 0.01ms !important;
   }
 
+
   .login-page .login-background {
     opacity: 0.28;
   }
 
-  /* Sin animación, el texto con degradado sigue siendo legible */
+
   .login-page .login-introduction h1 span {
     -webkit-text-fill-color: initial;
     background: none;

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Check, Eye, EyeOff, X } from "lucide-react";
 
 import "./Register.css";
-import logoGensti from "../assets/logo-gensti.png";
+import logoGensti from "../assets/genssti-logo.jpg";
 
 const FloatingLines = memo(
   lazy(() => import("../components/FloatingLines/FloatingLines"))
@@ -156,11 +156,23 @@ export default function RegisterPage() {
           className="register-brand"
           aria-label="GensTI, ir al inicio"
         >
-          <img
-            src={logoGensti}
-            alt="GensTI"
-            className="register-logo"
-          />
+          <div className="register-logo-frame">
+            <span
+              className="register-logo-glow"
+              aria-hidden="true"
+            />
+
+            <img
+              src={logoGensti}
+              alt="Logo de GensTI"
+              className="register-logo"
+            />
+          </div>
+
+          <div className="register-brand-text">
+            <strong>GensTI</strong>
+            <span>Ingeniería de Sistemas</span>
+          </div>
         </Link>
       </header>
 

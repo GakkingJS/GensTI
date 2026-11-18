@@ -819,3 +819,178 @@
     color: var(--aqua);
   }
 }
+
+.register-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.register-logo-frame {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 10px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.08),
+      rgba(255, 255, 255, 0.02)
+    ),
+    rgba(8, 14, 16, 0.65);
+  border: 1px solid rgba(114, 185, 71, 0.24);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  overflow: hidden;
+}
+
+.register-logo-glow {
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(
+    circle at 25% 30%,
+    rgba(114, 185, 71, 0.22),
+    transparent 60%
+  );
+  filter: blur(16px);
+  pointer-events: none;
+  animation: registerLogoGlow 6s ease-in-out infinite alternate;
+}
+
+.register-logo {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: auto;
+  height: 8px;
+  max-width: 12px; 
+  object-fit: contain;
+  filter: drop-shadow(0 1px 5px rgba(0, 0, 0, 0.3));
+}
+
+.register-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.register-brand-text strong {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.register-brand-text span {
+  font-size: 0.52rem;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+@keyframes registerLogoGlow {
+  from {
+    opacity: 0.35;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 0.75;
+    transform: scale(1.04);
+  }
+}
+
+@media (max-width: 520px) {
+  .register-brand {
+    gap: 6px;
+  }
+
+  .register-logo {
+    height: 13px;
+    max-width: 52px;
+  }
+
+  .register-brand-text strong {
+    font-size: 0.78rem;
+  }
+
+  .register-brand-text span {
+    font-size: 0.48rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .register-logo-glow {
+    animation: none;
+  }
+}
+
+
+.register-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+
+.register-logo-frame {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 7px;
+  background: rgba(4, 30, 38, 0.55);
+  border: 1px solid rgba(114, 185, 71, 0.22);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+}
+
+.register-logo-glow {
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(
+    circle at 25% 30%,
+    rgba(114, 185, 71, 0.22),
+    transparent 60%
+  );
+  filter: blur(12px);
+  pointer-events: none;
+}
+
+.register-logo {
+  position: relative;
+  z-index: 1;
+  width: 35px !important;
+  height: 35px !important;
+  max-width: 35px !important;
+  object-fit: contain !important;
+  display: block !important;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.3));
+}
+
+.register-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.register-brand-text strong {
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.register-brand-text span {
+  font-size: 0.42rem;
+  color: rgba(244, 250, 248, 0.65);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}

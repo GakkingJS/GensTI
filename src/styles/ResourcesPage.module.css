@@ -509,3 +509,282 @@
     transition: none;
   }
 }
+
+/* ==========================================================================
+   RESPONSIVE (tablet y celular)
+   ========================================================================== */
+
+/* ---------- Tablet (hasta 900px) ---------- */
+@media (max-width: 900px) {
+  .resources-page {
+    padding: 72px 6% 96px;
+  }
+
+  .resources-page-intro {
+    gap: 32px;
+    margin-bottom: 44px;
+  }
+
+  .resources-categories {
+    margin-bottom: 56px;
+  }
+
+  .resources-featured {
+    margin-bottom: 80px;
+  }
+
+  /* 2 columnas; si queda una tarjeta sola, ocupa todo el ancho
+     (así no se ve un hueco con el color de las líneas) */
+  .resources-featured-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resources-featured-grid > .resource-featured-reveal:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .resource-detail-page {
+    padding: 64px 6% 96px;
+  }
+
+  .resource-detail-layout {
+    grid-template-columns: minmax(0, 1fr) 200px;
+    gap: 48px;
+  }
+}
+
+/* ---------- Tablet pequeña y celular (hasta 760px) ---------- */
+@media (max-width: 760px) {
+  /* Cada fila de la lista pasa de 5 columnas a un bloque apilado:
+     número + icono + enlace arriba, descripción y datos debajo */
+  .resource-list-item {
+    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-areas:
+      "number icon link"
+      "content content content"
+      "meta meta meta";
+    gap: 14px;
+    padding: 22px 0;
+  }
+
+  .resource-list-number {
+    grid-area: number;
+  }
+
+  .resource-list-icon {
+    grid-area: icon;
+  }
+
+  .resource-list-link {
+    grid-area: link;
+    justify-self: end;
+    /* Zona táctil más cómoda */
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .resource-list-content {
+    grid-area: content;
+  }
+
+  .resource-list-meta {
+    grid-area: meta;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px 18px;
+  }
+
+  /* Detalle del recurso: contenido y datos en una sola columna */
+  .resource-detail-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+  }
+
+  .resource-detail-aside {
+    padding: 22px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--color-border-alt);
+  }
+}
+
+/* ---------- Celular (hasta 600px) ---------- */
+@media (max-width: 600px) {
+  .resources-page {
+    min-height: 0;
+    padding: 44px 20px 72px;
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+    /* Evita el scroll horizontal por las animaciones de entrada */
+    overflow-x: clip;
+  }
+
+  /* --- Encabezado --- */
+  .resources-page-intro {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    margin-bottom: 32px;
+  }
+
+  .resources-page-intro > header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resources-page-intro h1 {
+    margin-top: 12px;
+    font-size: clamp(34px, 11vw, 46px);
+    line-height: 1;
+    letter-spacing: -0.045em;
+    overflow-wrap: break-word;
+  }
+
+  .resources-page-intro p {
+    margin-top: 16px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* El contador y el botón PQRS quedan en una fila, bajo el texto */
+  .resources-summary {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-width: 0;
+    margin-top: 26px;
+    padding: 18px 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--color-border-alt);
+  }
+
+  /* --- Categorías: una sola fila que se desliza con el dedo --- */
+  .resources-categories {
+    flex-wrap: nowrap;
+    width: calc(100% + 40px);
+    max-width: none;
+    margin: 0 -20px 40px;
+    padding: 4px 20px 18px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .resources-categories::-webkit-scrollbar {
+    display: none;
+  }
+
+  .resources-categories button {
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding: 10px 14px;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+
+  /* --- Títulos de sección --- */
+  .resources-section-heading {
+    margin-bottom: 22px;
+  }
+
+  .resources-section-heading h2 {
+    font-size: 28px;
+    letter-spacing: -1px;
+  }
+
+  /* --- Recursos recomendados: una columna --- */
+  .resources-featured {
+    margin-bottom: 64px;
+  }
+
+  .resources-featured-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resources-featured-grid > .resource-featured-reveal:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+
+  .resource-featured-card {
+    min-height: 0;
+    padding: 24px 22px;
+  }
+
+  .resource-featured-card h3,
+  .resource-list-content h3 {
+    overflow-wrap: break-word;
+  }
+
+  .resource-card-footer {
+    padding-top: 22px;
+  }
+
+  /* Zona táctil de los enlaces */
+  .resource-card-footer a {
+    display: inline-block;
+    padding: 10px 0;
+  }
+
+  /* --- Detalle del recurso --- */
+  .resource-detail-page {
+    min-height: 0;
+    padding: 40px 20px 72px;
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
+    overflow-x: clip;
+  }
+
+  .resource-detail-page .back-link {
+    margin-bottom: 36px;
+  }
+
+  .resource-detail-header {
+    margin-bottom: 44px;
+  }
+
+  .resource-detail-icon {
+    width: 68px;
+    height: 68px;
+    margin-bottom: 20px;
+  }
+
+  .resource-detail-header h1 {
+    font-size: clamp(34px, 11vw, 46px);
+    line-height: 1;
+    letter-spacing: -0.045em;
+    overflow-wrap: break-word;
+  }
+
+  .resource-detail-header p {
+    margin-top: 18px;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  .resource-detail-main {
+    padding-top: 28px;
+  }
+
+  .resource-detail-main > p {
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  /* El botón principal ocupa todo el ancho: más fácil de tocar */
+  .resource-primary-link {
+    display: block;
+    margin-top: 26px;
+    padding: 16px 18px;
+    text-align: center;
+  }
+
+  .resource-not-found {
+    min-height: 0;
+    padding: 72px 20px;
+  }
+
+  .resource-not-found h1 {
+    font-size: 34px;
+  }
+}

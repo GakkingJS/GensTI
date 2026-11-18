@@ -2,7 +2,7 @@ import { lazy, memo, Suspense, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import "./Login.css";
-import logoGensti from "../assets/logo-gensti.png";
+import logoGensti from "../assets/genssti-logo.jpg";
 import { useAuth } from "../context/AuthContext";
 
 const FloatingLines = memo(
@@ -104,14 +104,23 @@ function Login() {
 
       {/* Header */}
       <header className="login-header">
-        <div className="brand">
+      <div className="brand">
+        <div className="brand-logo-frame">
+          <span className="brand-logo-glow" aria-hidden="true" />
+
           <img
             className="brand-logo"
             src={logoGensti}
-            alt="GENSTI - Ingeniería de Sistemas"
+            alt="Logo de GensTI"
           />
         </div>
-      </header>
+
+        <div className="brand-text">
+          <strong>GensTI</strong>
+          <span>Ingeniería de Sistemas</span>
+        </div>
+      </div>
+    </header>
 
       {/* Contenido principal */}
       <section className="login-content">
