@@ -11,10 +11,9 @@ import {
   Terminal,
 } from "lucide-react";
 
-
+import styles from "../styles/ResourcesPage.module.css";
 import { resources } from "../data/resources";
 import ScrollReveal from "../components/ScrollReveal";
-
 
 const resourceIcons = {
   library: Library,
@@ -27,10 +26,8 @@ const resourceIcons = {
   terminal: Terminal,
 };
 
-
 function ResourceIcon({ name, size = 28 }) {
   const Icon = resourceIcons[name] || BookOpen;
-
 
   return (
     <Icon
@@ -41,7 +38,6 @@ function ResourceIcon({ name, size = 28 }) {
   );
 }
 
-
 function ResourcesPage() {
   const categories = [
     "TODOS",
@@ -50,45 +46,42 @@ function ResourcesPage() {
     ),
   ];
 
-
   const featuredResources = resources.filter(
     (resource) => resource.featured
   );
 
-
   return (
-    <section className="resources-page">
-      <ScrollReveal className="resources-page-intro">
+    <section className={styles.resourcesPage}>
+      <ScrollReveal className={styles.resourcesPageIntro}>
         <header>
           <div>
-            <span className="section-label">
+            <span className={styles.sectionLabel}>
               CENTRO DE RECURSOS
             </span>
 
-
             <h1>Lo que necesitas para avanzar</h1>
 
-
             <p>
-              Encuentra documentos, herramientas, guías y enlaces útiles para
-              tu recorrido en Ingeniería de Sistemas.
+              Encuentra documentos, herramientas, guías y enlaces
+              útiles para tu recorrido en Ingeniería de Sistemas.
             </p>
           </div>
 
-
-          <div className="resources-summary">
-            <div className="resources-summary-count">
+          <div className={styles.resourcesSummary}>
+            <div className={styles.resourcesSummaryCount}>
               <strong>{resources.length}</strong>
+
               <span>recursos organizados</span>
             </div>
 
-
-            <Link to="/pqrs" className="resources-pqrs-button">
+            <Link
+              to="/pqrs"
+              className={styles.resourcesPqrsButton}
+            >
               <MessageSquareText
                 size={18}
                 aria-hidden="true"
               />
-
 
               PQRS
             </Link>
@@ -96,9 +89,8 @@ function ResourcesPage() {
         </header>
       </ScrollReveal>
 
-
       <ScrollReveal
-        className="resources-categories"
+        className={styles.resourcesCategories}
         delay={0.08}
       >
         {categories.map((category, index) => (
@@ -114,34 +106,33 @@ function ResourcesPage() {
         ))}
       </ScrollReveal>
 
-
-      <section className="resources-featured">
+      <section className={styles.resourcesFeatured}>
         <ScrollReveal
-          className="resources-section-heading"
+          className={styles.resourcesSectionHeading}
           delay={0.1}
         >
           <div>
-            <span className="section-label">
+            <span className={styles.sectionLabel}>
               PARA EMPEZAR
             </span>
-
 
             <h2>Recursos recomendados</h2>
           </div>
         </ScrollReveal>
 
-
         {featuredResources.length > 0 ? (
-          <div className="resources-featured-grid">
+          <div className={styles.resourcesFeaturedGrid}>
             {featuredResources.map((resource, index) => (
               <ScrollReveal
                 key={resource.id}
-                className="resource-featured-reveal"
+                className={styles.resourceFeaturedReveal}
                 delay={index * 0.09}
               >
-                <article className="resource-featured-card">
+                <article
+                  className={styles.resourceFeaturedCard}
+                >
                   <div
-                    className="resource-icon"
+                    className={styles.resourceIcon}
                     aria-label={`Icono de ${resource.type}`}
                   >
                     <ResourceIcon
@@ -150,21 +141,16 @@ function ResourcesPage() {
                     />
                   </div>
 
-
-                  <span className="resource-type">
+                  <span className={styles.resourceType}>
                     {resource.type}
                   </span>
 
-
                   <h3>{resource.title}</h3>
-
 
                   <p>{resource.description}</p>
 
-
-                  <div className="resource-card-footer">
+                  <div className={styles.resourceCardFooter}>
                     <span>{resource.category}</span>
-
 
                     <Link
                       to={`/recursos/${resource.id}`}
@@ -178,79 +164,77 @@ function ResourcesPage() {
           </div>
         ) : (
           <ScrollReveal>
-            <p className="resources-empty-state">
+            <p className={styles.resourcesEmptyState}>
               No hay recursos recomendados por ahora.
             </p>
           </ScrollReveal>
         )}
       </section>
 
-
-      <section className="resources-list-section">
+      <section className={styles.resourcesListSection}>
         <ScrollReveal
-          className="resources-section-heading"
+          className={styles.resourcesSectionHeading}
           delay={0.1}
         >
           <div>
-            <span className="section-label">
+            <span className={styles.sectionLabel}>
               EXPLORAR
             </span>
-
 
             <h2>Todos los recursos</h2>
           </div>
         </ScrollReveal>
 
-
         {resources.length > 0 ? (
-          <div className="resources-list">
+          <div className={styles.resourcesList}>
             {resources.map((resource, index) => (
               <ScrollReveal
                 key={resource.id}
-                className="resource-list-reveal"
+                className={styles.resourceListReveal}
                 delay={index * 0.06}
               >
-                <article className="resource-list-item">
-                  <span className="resource-list-number">
+                <article
+                  className={styles.resourceListItem}
+                >
+                  <span
+                    className={styles.resourceListNumber}
+                  >
                     {String(index + 1).padStart(2, "0")}
                   </span>
 
-
-                  <span className="resource-list-icon">
+                  <span
+                    className={styles.resourceListIcon}
+                  >
                     <ResourceIcon
                       name={resource.icon}
                       size={24}
                     />
                   </span>
 
-
-                  <div className="resource-list-content">
-                    <span className="resource-type">
+                  <div
+                    className={styles.resourceListContent}
+                  >
+                    <span className={styles.resourceType}>
                       {resource.category}
                     </span>
 
-
                     <h3>{resource.title}</h3>
-
 
                     <p>{resource.description}</p>
                   </div>
 
-
-                  <div className="resource-list-meta">
+                  <div className={styles.resourceListMeta}>
                     <span>
                       {resource.semester === "GENERAL"
                         ? "General"
                         : `Semestre ${resource.semester}`}
                     </span>
 
-
                     <span>{resource.access}</span>
                   </div>
 
-
                   <Link
-                    className="resource-list-link"
+                    className={styles.resourceListLink}
                     to={`/recursos/${resource.id}`}
                   >
                     Abrir →
@@ -261,7 +245,7 @@ function ResourcesPage() {
           </div>
         ) : (
           <ScrollReveal>
-            <p className="resources-empty-state">
+            <p className={styles.resourcesEmptyState}>
               No hay recursos disponibles por ahora.
             </p>
           </ScrollReveal>
@@ -270,6 +254,5 @@ function ResourcesPage() {
     </section>
   );
 }
-
 
 export default ResourcesPage;
