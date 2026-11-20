@@ -10,8 +10,8 @@ import {
   Terminal,
 } from "lucide-react";
 
+import styles from "../styles/ResourcesPage.module.css";
 import { resources } from "../data/resources";
-
 import ScrollReveal from "../components/ScrollReveal";
 
 const resourceIcons = {
@@ -37,12 +37,16 @@ function ResourceDetailPage() {
 
   if (!resource) {
     return (
-      <section className="resource-not-found">
-        <span className="section-label">CENTRO DE RECURSOS</span>
-        <h1>Recurso no encontrado</h1>
-        <p>El recurso solicitado no está disponible en este prototipo.</p>
+      <section className={styles.resourceNotFound}>
+        <span className={styles.sectionLabel}>CENTRO DE RECURSOS</span>
 
-        <Link className="resource-primary-link" to="/recursos">
+        <h1>Recurso no encontrado</h1>
+
+        <p>
+          El recurso solicitado no está disponible en este prototipo.
+        </p>
+
+        <Link className={styles.resourcePrimaryLink} to="/recursos">
           Volver a recursos →
         </Link>
       </section>
@@ -50,26 +54,30 @@ function ResourceDetailPage() {
   }
 
   return (
-    <article className="resource-detail-page">
-      <Link className="back-link" to="/recursos">
+    <article className={styles.resourceDetailPage}>
+      <Link className={styles.backLink} to="/recursos">
         ← Volver al centro de recursos
       </Link>
 
-      <header className="resource-detail-header">
-        <div className="resource-detail-icon">
+      <ScrollReveal className={styles.resourceDetailHeader}>
+        <div className={styles.resourceDetailIcon}>
           <ResourceIcon name={resource.icon} />
         </div>
 
-        <span className="resource-type">{resource.category}</span>
+        <span className={styles.resourceType}>
+          {resource.category}
+        </span>
 
         <h1>{resource.title}</h1>
 
         <p>{resource.description}</p>
-      </header>
+      </ScrollReveal>
 
-      <div className="resource-detail-layout">
-        <div className="resource-detail-main">
-          <span className="section-label">SOBRE ESTE RECURSO</span>
+      <div className={styles.resourceDetailLayout}>
+        <div className={styles.resourceDetailMain}>
+          <span className={styles.sectionLabel}>
+            SOBRE ESTE RECURSO
+          </span>
 
           <p>
             Este recurso forma parte del centro de apoyo de GENSTI y está
@@ -85,7 +93,7 @@ function ResourceDetailPage() {
 
           {resource.externalUrl ? (
             <a
-              className="resource-primary-link"
+              className={styles.resourcePrimaryLink}
               href={resource.externalUrl}
               target="_blank"
               rel="noreferrer"
@@ -93,13 +101,17 @@ function ResourceDetailPage() {
               Ir al recurso ↗
             </a>
           ) : (
-            <button className="resource-primary-link" type="button">
+            <button
+              className={styles.resourcePrimaryLink}
+              type="button"
+              disabled
+            >
               Recurso en preparación
             </button>
           )}
         </div>
 
-        <aside className="resource-detail-aside">
+        <aside className={styles.resourceDetailAside}>
           <span>CATEGORÍA</span>
           <strong>{resource.category}</strong>
 

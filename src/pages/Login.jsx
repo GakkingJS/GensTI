@@ -191,17 +191,11 @@ function Login() {
                   Contraseña
                 </label>
 
-                <button
-                  type="button"
-                  className="forgot-password"
-                  onClick={() => {
-                    setError(
-                      "La recuperación de contraseña estará disponible próximamente."
-                    );
-                  }}
-                >
+                <Link
+                  to="/olvide-contrasena"
+                  className="forgot-password">
                   ¿La olvidaste?
-                </button>
+                </Link>
               </div>
 
               <div className="password-input">
