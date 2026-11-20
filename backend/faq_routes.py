@@ -1,3 +1,4 @@
+
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -5,7 +6,11 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from database import get_db
-from models import FaqItem, FaqDocument
+
+from models import (
+    FaqItem,
+    FaqDocument,
+)
 
 from faq_schemas import (
     ChatRequest,
@@ -17,7 +22,10 @@ from chatbot_service import (
     ask_ollama,
     build_context,
     find_best_faq,
+    NO_KNOWLEDGE_ANSWER,
 )
+
+from knowledge.service import get_context_for_model
 
 
 router = APIRouter(
@@ -26,11 +34,16 @@ router = APIRouter(
 )
 
 
+# =========================================================
+# LISTAR PREGUNTAS FRECUENTES
+# =========================================================
+
 @router.get("/", response_model=list[FaqItemRead])
 def list_faqs(
     category: Optional[str] = None,
     db: Session = Depends(get_db),
 ):
+
     query = (
         select(FaqItem)
         .where(FaqItem.status == "approved")
@@ -41,13 +54,22 @@ def list_faqs(
     )
 
     if category:
-        query = query.where(FaqItem.category == category)
+        query = query.where(
+            FaqItem.category == category
+        )
 
     return db.execute(query).scalars().all()
 
 
+# =========================================================
+# LISTAR CATEGORÍAS
+# =========================================================
+
 @router.get("/categories")
-def list_categories(db: Session = Depends(get_db)):
+def list_categories(
+    db: Session = Depends(get_db),
+):
+
     result = db.execute(
         select(FaqItem.category)
         .where(FaqItem.status == "approved")
@@ -63,24 +85,37 @@ def list_categories(db: Session = Depends(get_db)):
     }
 
 
+# =========================================================
+# CHAT DE GENSTI
+# =========================================================
+
 @router.post("/chat", response_model=ChatResponse)
 async def chat(
     payload: ChatRequest,
     db: Session = Depends(get_db),
 ):
+
     question = payload.question.strip()
 
+    # -----------------------------------------------------
+    # VALIDAR PREGUNTA
+    # -----------------------------------------------------
+
     if len(question) < 3:
+
         raise HTTPException(
             status_code=400,
             detail="Escribe una consulta más específica.",
         )
 
-    matched = find_best_faq(db, question)
+    # -----------------------------------------------------
+    # PRIMER NIVEL: PREGUNTAS FRECUENTES APROBADAS
+    # -----------------------------------------------------
 
-    # FAQ encontrada: devolver el texto aprobado.
-    # Esta rama no utiliza Ollama.
+    matched, score = find_best_faq(db, question)
+
     if matched:
+
         documents = db.execute(
             select(FaqDocument)
             .where(FaqDocument.faq_id == matched.id)
@@ -93,17 +128,54 @@ async def chat(
             "suggestions": [],
         }
 
-    # Sin coincidencia: consultar a Ollama.
-    context = build_context(db)
-    answer = await ask_ollama(question, context)
+    # -----------------------------------------------------
+    # SEGUNDO NIVEL: BASE DE CONOCIMIENTO MARKDOWN
+    # -----------------------------------------------------
+
+    context = build_context(db, question)
+
+    # Si no hay fuentes institucionales, no llamar a Ollama.
+    if not context:
+
+        return {
+            "answer": NO_KNOWLEDGE_ANSWER,
+            "matched_question": None,
+            "documents": [],
+            "suggestions": [
+                "¿Cuáles son los horarios del Parche GENSTI?",
+                "¿Cómo realizo mi matrícula?",
+                "¿Dónde y cómo puedo pagar mi matrícula?",
+            ],
+        }
+
+    # -----------------------------------------------------
+    # TERCER NIVEL: GENERACIÓN CON OLLAMA
+    # -----------------------------------------------------
+
+    answer = await ask_ollama(
+        question,
+        context,
+    )
 
     return {
         "answer": answer,
         "matched_question": None,
         "documents": [],
         "suggestions": [
-            "¿Cuáles son los horarios del Parche GensTI?",
+            "¿Cuáles son los horarios del Parche GENSTI?",
             "¿Cómo realizo mi matrícula?",
             "¿Dónde y cómo puedo pagar mi matrícula?",
         ],
     }
+
+
+# =========================================================
+# PRUEBA DE LA BASE DE CONOCIMIENTO
+# =========================================================
+
+@router.get("/knowledge-test")
+def knowledge_test(
+    question: str,
+):
+
+    return get_context_for_model(question)
