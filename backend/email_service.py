@@ -60,3 +60,80 @@ def send_verification_email(recipient: str, code: str) -> None:
 
     if response.status_code >= 300:
         raise EmailDeliveryError(f"Brevo respondió {response.status_code}")
+    
+
+def send_password_reset_email(
+    recipient: str,
+    token: str,
+    frontend_base_url: str,
+) -> None:
+    api_key = os.getenv("BREVO_API_KEY")
+    sender_email = os.getenv("EMAIL_FROM")
+    sender_name = os.getenv("EMAIL_FROM_NAME", "GENSTI")
+
+    if not api_key or not sender_email:
+        raise EmailDeliveryError("Falta BREVO_API_KEY o EMAIL_FROM")
+
+    reset_url = (
+        f"{frontend_base_url.rstrip('/')}"
+        f"/restablecer-contrasena?token={token}"
+    )
+
+    html = f"""
+    <div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;
+                padding:28px;border:1px solid #d9edeb;border-radius:18px;">
+      <h2 style="color:#0d9488;margin:0 0 12px;">
+        Restablece tu contraseña de GENSTI
+      </h2>
+
+      <p style="color:#475569;">
+        Haz clic en el siguiente botón para crear una nueva contraseña:
+      </p>
+
+      <p style="text-align:center;margin:28px 0;">
+        <a
+          href="{reset_url}"
+          style="display:inline-block;padding:14px 26px;border-radius:14px;
+                 background:#0d9488;color:#ffffff;font-weight:700;
+                 text-decoration:none;"
+        >
+          Restablecer contraseña
+        </a>
+      </p>
+
+      <p style="color:#64748b;font-size:14px;">
+        Este enlace expira en 30 minutos y solo puede usarse una vez.
+        Si no solicitaste el cambio, ignora este mensaje.
+      </p>
+    </div>
+    """
+
+    payload = {
+        "sender": {
+            "name": sender_name,
+            "email": sender_email,
+        },
+        "to": [{"email": recipient}],
+        "subject": "Restablece tu contraseña de GENSTI",
+        "htmlContent": html,
+    }
+
+    try:
+        response = httpx.post(
+            BREVO_URL,
+            json=payload,
+            headers={
+                "api-key": api_key,
+                "accept": "application/json",
+            },
+            timeout=10,
+        )
+    except httpx.HTTPError as exc:
+        raise EmailDeliveryError(
+            "No se pudo contactar a Brevo"
+        ) from exc
+
+    if response.status_code >= 300:
+        raise EmailDeliveryError(
+            f"Brevo respondió {response.status_code}"
+        )

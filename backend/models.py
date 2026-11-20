@@ -199,6 +199,120 @@ class EmailOutbox(Base):
     )
 
 
+class PasswordResetToken(Base):
+    __tablename__ = "password_reset_tokens"
+    __table_args__ = (
+        Index(
+            "ix_password_reset_tokens_user_id",
+            "user_id",
+        ),
+        Index(
+            "ix_password_reset_tokens_token_hash",
+            "token_hash",
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        primary_key=True,
+        default=uuid4,
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    token_hash: Mapped[str] = mapped_column(
+        String(64),
+        nullable=False,
+        unique=True,
+    )
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+    )
+    used_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+
+
+class PasswordResetOutbox(Base):
+    __tablename__ = "password_reset_outbox"
+    __table_args__ = (
+        CheckConstraint(
+            "status IN ('pending', 'processing', 'sent', 'failed')",
+            name="ck_password_reset_outbox_status",
+        ),
+        CheckConstraint(
+            "attempts >= 0",
+            name="ck_password_reset_outbox_attempts_nonnegative",
+        ),
+        CheckConstraint(
+            "status NOT IN ('pending', 'processing') "
+            "OR token_ciphertext IS NOT NULL",
+            name="ck_password_reset_outbox_active_ciphertext",
+        ),
+        Index(
+            "ix_password_reset_outbox_status_available_at",
+            "status",
+            "available_at",
+        ),
+    )
+
+    id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        primary_key=True,
+        default=uuid4,
+    )
+    password_reset_token_id: Mapped[UUID] = mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("password_reset_tokens.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    recipient: Mapped[str] = mapped_column(
+        String(254),
+        nullable=False,
+    )
+    token_ciphertext: Mapped[str] = mapped_column(
+        Text,
+        nullable=False,
+    )
+    status: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        server_default="pending",
+    )
+    attempts: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        server_default="0",
+    )
+    available_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+    )
+    sent_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+    )
+    locked_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True),
+    )
+    last_error: Mapped[str | None] = mapped_column(
+        String(200),
+    )
+
+
 class Role(Base):
     __tablename__ = "roles"
 

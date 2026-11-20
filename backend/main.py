@@ -35,6 +35,13 @@ from email_verification import (
     verify_email_code,
 )
 
+from password_reset import (
+    InvalidPasswordResetToken,
+    create_password_reset_token,
+    queue_password_reset_email,
+    reset_password,
+)
+
 from news_routes import router as news_router
 from news_images_routes import router as news_images_router
 from calendar_routes import router as calendar_router
@@ -100,6 +107,15 @@ class RegisterRequest(BaseModel):
 
 class LoginRequest(BaseModel):
     email: EmailStr
+    password: str
+
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
     password: str
 
 
@@ -231,6 +247,99 @@ def resend_verification(
     return {
         "status": "ok",
         "message": "Enviamos un nuevo código de verificación.",
+    }
+
+
+
+@app.post("/auth/forgot-password")
+def forgot_password(
+    payload: ForgotPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    email = str(payload.email).strip().lower()
+
+    user = db.scalar(
+        select(User).where(User.email == email)
+    )
+
+    if (
+        user is not None
+        and user.email_verified_at is not None
+        and user.is_active
+    ):
+        cipher = load_outbox_cipher()
+
+        try:
+            db.rollback()
+
+            with db.begin():
+                raw_token = create_password_reset_token(
+                    db=db,
+                    user=user,
+                )
+
+                queue_password_reset_email(
+                    db=db,
+                    user=user,
+                    raw_token=raw_token,
+                    cipher=cipher,
+                )
+        except Exception:
+            logger.exception(
+                "No se pudo preparar la recuperación de contraseña"
+            )
+            raise HTTPException(
+                status_code=500,
+                detail=(
+                    "No pudimos procesar la solicitud. "
+                    "Intenta de nuevo."
+                ),
+            )
+
+    return {
+        "status": "ok",
+        "message": (
+            "Si el correo está registrado, enviaremos un enlace "
+            "para restablecer la contraseña."
+        ),
+    }
+
+@app.post("/auth/reset-password")
+def reset_password_endpoint(
+    payload: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    try:
+        with db.begin():
+            reset_password(
+                db=db,
+                raw_token=payload.token,
+                new_password=payload.password,
+            )
+    except InvalidPasswordResetToken:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "El enlace no es válido, expiró o ya fue utilizado."
+            ),
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
+    except Exception:
+        logger.exception(
+            "No se pudo restablecer la contraseña"
+        )
+        raise HTTPException(
+            status_code=500,
+            detail="No pudimos restablecer la contraseña.",
+        )
+
+    return {
+        "status": "ok",
+        "message": "Tu contraseña fue actualizada correctamente.",
     }
 
 @app.post("/auth/login")
